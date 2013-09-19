@@ -125,3 +125,14 @@ When no body is present, an empty instance is made available. If, however, there
 A [fixed-length byte pool](https://github.com/viki-org/bytepool) is used to parse input bodies. The size of this pool is configured with the `BodyPool` configuration method. For example, to specify a max input body size of 64K and to pre-allocate 512 slots, you'd use:
 
     c := auwfg.Configure().BodyPool(64 * 1024, 512)
+    
+### Responses
+A `auwfg.Response` must implement three members:
+
+- `Body() []byte`
+- `Status() int`
+- `Header() http.Header`
+
+The `JsonResponse(body string, status int)` helper should prove helpful.
+
+The `Fatal(err error)` helper should be used when an `InternalServerError` should be returned and an error logged (using the standard logger)

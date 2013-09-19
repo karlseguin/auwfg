@@ -39,9 +39,16 @@ func (r *Router) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 
 func (r *Router) reply(writer http.ResponseWriter, res Response, req *http.Request) {
   if res == nil {
-    log.Printf("nil response from call to %q\n", req.URL.String())
+    log.Printf("%q \t nil response", req.URL.String())
     res = r.internalServerError
+  } else  if res.Status() == 500 {
+    if fatal, ok := res.(*FatalResponse); ok {
+      log.Printf("%q \t %v", req.URL.String(), fatal.err)
+    } else {
+      log.Printf("%q \t 500", req.URL.String())
+    }
   }
+
   h := writer.Header()
   for k, v := range res.Header() { h[k] = v }
   writer.WriteHeader(res.Status())

@@ -41,3 +41,12 @@ func JsonResponse(raw string, s int) Response {
     H: http.Header{"Content-Type": JsonHeader, "Content-Length": []string{strconv.Itoa(len(b))}},
   }
 }
+
+type FatalResponse struct {
+  err error
+  Response
+}
+
+func Fatal(err error) Response {
+  return &FatalResponse{err, InternalServerError,}
+}
