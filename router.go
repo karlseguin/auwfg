@@ -3,13 +3,18 @@ package auwfg
 import(
   "strings"
   "net/http"
-  // "users/server/middleware"
+  "encoding/json"
+  "github.com/viki-org/bytepool"
 )
-
-// var middlewareRunner = func(context *web.Context, route *web.Route) web.Response { return middleware.Run(context, route) }
 
 type Router struct {
   *Configuration
+  bodyPool *bytepool.Pool
+}
+
+func newRouter(c *Configuration) *Router {
+  bp := bytepool.New(c.bodyPoolSize, c.maxBodySize)
+  return &Router{c, bp}
 }
 
 func (r *Router) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
@@ -18,9 +23,14 @@ func (r *Router) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
     reply(writer, r.notFound)
     return
   }
-  bc := &BaseContext{Route: route, Params: params, Req: req,}
+  bc := newBaseContext(route, params, req)
+  if body, res := r.loadBody(route, req); res != nil {
+    reply(writer, res)
+    return
+  } else {
+    bc.Body = body
+  }
   context := r.contextFactory(bc)
-  // reply(writer, middlewareRunner(context, route))
   reply(writer, r.dispatcher(route, context))
 }
 
@@ -61,6 +71,17 @@ func (r *Router) loadRouteAndParams(req *http.Request) (*Route, *Params) {
 
   params.Version = parts[0]
   return route, params
+}
+func (r *Router) loadBody(route *Route, req *http.Request) (interface{}, Response) {
+  defer req.Body.Close()
+  if route.BodyFactory == nil { return nil, nil }
+
+  body := route.BodyFactory()
+  buffer := r.bodyPool.Checkout()
+  defer buffer.Close()
+  if n, _ := buffer.ReadFrom(req.Body); n == 0 { return body, nil }
+  if err := json.Unmarshal(buffer.Bytes(), body); err != nil { return nil, r.invalidFormat }
+  return body, nil
 }
 
 func loadParams(parts []string) *Params {

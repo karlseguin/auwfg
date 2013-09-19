@@ -24,3 +24,8 @@ func R(method, version, resource string, action interface{}) *RouteBuilder {
     resource: resource,
   }
 }
+
+func (r *RouteBuilder) BodyFactory(bf func() interface{}) *RouteBuilder {
+  r.bf = bf
+  return r
+}
