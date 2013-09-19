@@ -29,10 +29,10 @@ func Configure() *Configuration{
     bodyPoolSize: 1024,
     dispatcher: genericDispatcher,
     contextFactory: genericContextFactory,
-    notFound: JsonResponse(`{"error":"not found","code":404}`, 404),
+    notFound: NotFound,
+    internalServerError: InternalServerError,
     bodyTooLarge: JsonResponse(`{"error":"body too large","code":413}`, 413),
     invalidFormat: JsonResponse(`{"error":"invalid input format","code":400}`, 400),
-    internalServerError: JsonResponse(`{"error":"internal server error","code":500}`, 500),
   }
 }
 

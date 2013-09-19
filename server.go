@@ -8,8 +8,8 @@ import (
   "net/http"
 )
 
-var NotFound Response
-var InternalServerError Response
+var NotFound = JsonResponse(`{"error":"not found","code":404}`, 404)
+var InternalServerError = JsonResponse(`{"error":"internal server error","code":500}`, 500)
 
 func Run(config *Configuration) {
   NotFound = config.notFound
