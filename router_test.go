@@ -128,6 +128,74 @@ func TestHandlesBodiesLargerThanAllowed(t *testing.T) {
   assertResponse(t, res, 413, `{"error":"body too large","code":413}`)
 }
 
+func TestParsesQueryString(t *testing.T) {
+  spec := gspec.New(t)
+  f := func(context *TestContext) Response {
+    spec.Expect(context.Query["app"]).ToEqual("6003")
+    spec.Expect(context.Query["t"]).ToEqual("1 2")
+    return nil
+  }
+  c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
+  req := gspec.Request().Url("/v1/worms/22w.json?APP=6003&t=1%202&").Req
+  newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
+}
+
+func TestParsesQueryStirngWithEmptyPairAtTheStart(t *testing.T) {
+  spec := gspec.New(t)
+  f := func(context *TestContext) Response {
+    spec.Expect(context.Query["app"]).ToEqual("100004a")
+    return nil
+  }
+  c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
+  req := gspec.Request().Url("/v1/worms/22w.json?&app=100004a").Method("GET").Req
+  newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
+}
+
+func TestParsesQueryStirngWithEmptyPairInTheMiddle(t *testing.T) {
+  spec := gspec.New(t)
+  f := func(context *TestContext) Response {
+    spec.Expect(context.Query["app"]).ToEqual("100004a")
+    spec.Expect(context.Query["t"]).ToEqual("1")
+    return nil
+  }
+  c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
+  req := gspec.Request().Url("/v1/worms/22w.json?app=100004a&&t=1").Method("GET").Req
+  newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
+}
+
+func TestHandlesMultipleQuestionMarksInQueryString(t *testing.T) {
+  spec := gspec.New(t)
+  f := func(context *TestContext) Response {
+    spec.Expect(context.Query["app"]).ToEqual("100005a")
+    return nil
+  }
+  c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
+  req := gspec.Request().Url("/v1/worms/22w.json?app=100002a?app=100005a").Method("GET").Req
+  newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
+}
+
+func TestParsesAQueryStringWithAMissingValue(t *testing.T) {
+  spec := gspec.New(t)
+  f := func(context *TestContext) Response {
+    spec.Expect(len(context.Query)).ToEqual(0)
+    return nil
+  }
+  c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
+  req := gspec.Request().Url("/v1/worms/22w.json?a").Method("GET").Req
+  newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
+}
+
+func TestParsesAQueryStringWithAMissingValue2(t *testing.T) {
+  spec := gspec.New(t)
+  f := func(context *TestContext) Response {
+    spec.Expect(context.Query["b"]).ToEqual("")
+    return nil
+  }
+  c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
+  req := gspec.Request().Url("/v1/worms/22w.json?b=").Method("GET").Req
+  newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
+}
+
 func assertResponse(t *testing.T, res *httptest.ResponseRecorder, status int, raw string) {
   spec := gspec.New(t)
   spec.Expect(res.Code).ToEqual(status)

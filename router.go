@@ -3,6 +3,7 @@ package auwfg
 import(
   "log"
   "strings"
+  "net/url"
   "net/http"
   "encoding/json"
   "github.com/viki-org/bytepool"
@@ -31,6 +32,7 @@ func (r *Router) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
   } else {
     bc.Body = body
   }
+  bc.Query = loadQuery(req.URL.RawQuery)
   context := r.contextFactory(bc)
   r.reply(writer, r.dispatcher(route, context), req)
 }
@@ -115,4 +117,31 @@ func loadParams(parts []string) *Params {
     params.Id = parts[3]
   }
   return params
+}
+
+
+func loadQuery(raw string) map[string]string {
+  l := len(raw)
+  if l == 0 { return nil }
+
+  query := make(map[string]string)
+  for i := 0; i < l; i++ {
+    for ;raw[i] == '&' ;i++ { }
+    start := i
+    for ;;i++ {
+      if i == l { return query }
+      if raw[i] == '=' { break; }
+    }
+    key := raw[start:i]
+    i++
+    start = i
+    for ;;i++ {
+      if i == l || raw[i] == '&' ||  raw[i] == '?' { break; }
+    }
+    value := raw[start:i]
+    if escaped, err := url.QueryUnescape(value); err == nil {
+      query[strings.ToLower(key)] = escaped
+    }
+  }
+  return query
 }
