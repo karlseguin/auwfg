@@ -1,6 +1,7 @@
 package auwfg
 
 import(
+  "log"
   "strings"
   "net/http"
   "encoding/json"
@@ -20,22 +21,23 @@ func newRouter(c *Configuration) *Router {
 func (r *Router) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
   route, params := r.loadRouteAndParams(req)
   if route == nil {
-    r.reply(writer, r.notFound)
+    r.reply(writer, r.notFound, req)
     return
   }
   bc := newBaseContext(route, params, req)
   if body, res := r.loadBody(route, req); res != nil {
-    r.reply(writer, res)
+    r.reply(writer, res, req)
     return
   } else {
     bc.Body = body
   }
   context := r.contextFactory(bc)
-  r.reply(writer, r.dispatcher(route, context))
+  r.reply(writer, r.dispatcher(route, context), req)
 }
 
-func (r *Router) reply(writer http.ResponseWriter, res Response) {
+func (r *Router) reply(writer http.ResponseWriter, res Response, req *http.Request) {
   if res == nil {
+    log.Printf("nil response from call to %q\n", req.URL.String())
     res = r.internalServerError
   }
   h := writer.Header()
