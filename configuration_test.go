@@ -46,3 +46,11 @@ func TestFixesRouteCasing(t *testing.T) {
         Route(R("get", "V1", "GHOLAS", "getgholas"))
   spec.Expect(c.routes["v1"]["gholas"]["GET"].Action.(string)).ToEqual("getgholas")
 }
+
+func TestSetsThePoolSize(t *testing.T) {
+  spec := gspec.New(t)
+  c := Configure().BodyPool(16, 10)
+  //allocate 1 extra byte so we know if the body is too large (or just right)
+  spec.Expect(c.maxBodySize).ToEqual(int64(17))
+  spec.Expect(c.bodyPoolSize).ToEqual(10)
+}

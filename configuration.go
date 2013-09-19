@@ -6,9 +6,10 @@ import (
 
 type Configuration struct {
   address string
-  maxBodySize int
+  maxBodySize int64
   bodyPoolSize int
   notFound Response
+  bodyTooLarge Response
   invalidFormat Response
   internalServerError Response
   routes versions
@@ -24,11 +25,12 @@ func Configure() *Configuration{
   return &Configuration{
     routes: make(versions),
     address: "127.0.0.1:4577",
-    maxBodySize: 32768,
+    maxBodySize: 32769,
     bodyPoolSize: 1024,
     dispatcher: genericDispatcher,
     contextFactory: genericContextFactory,
     notFound: JsonResponse(`{"error":"not found","code":404}`, 404),
+    bodyTooLarge: JsonResponse(`{"error":"body too large","code":413}`, 413),
     invalidFormat: JsonResponse(`{"error":"invalid input format","code":400}`, 400),
     internalServerError: JsonResponse(`{"error":"internal server error","code":500}`, 500),
   }
@@ -46,6 +48,15 @@ func (c *Configuration) NotFoundResponse(r Response) *Configuration {
 
 func (c *Configuration) NotFound(body string) *Configuration {
   return c.NotFoundResponse(JsonResponse(body, 404))
+}
+
+func (c *Configuration) BodyTooLargeResponse(r Response) *Configuration {
+  c.bodyTooLarge = r
+  return c
+}
+
+func (c *Configuration) BodyTooLarge(body string) *Configuration {
+  return c.BodyTooLargeResponse(JsonResponse(body, 413))
 }
 
 func (c *Configuration) InvalidFormatResponse(r Response) *Configuration {
@@ -78,7 +89,7 @@ func (c *Configuration) ContextFactory(cf ContextFactory) *Configuration {
 
 func (c *Configuration) BodyPool(maxBodySize int, poolSize int) *Configuration {
   c.bodyPoolSize = poolSize
-  c.maxBodySize = maxBodySize
+  c.maxBodySize = int64(maxBodySize + 1)
   return c
 }
 

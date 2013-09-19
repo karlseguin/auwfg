@@ -33,6 +33,8 @@ Possible configuration options are:
 - `Address`: the address to listen to
 - `NotFound`: the body to reply with when a route isn't found
 - `NotFoundResponse`: the response to reply with when a route isn't found (gives more control than the simpler `NotFound`). Note that once set, this response is available as `auwfg.NotFound` for use in your own application
+- `BodyTooLarge`: the body to reply with when an input body is too large (see `BodyPool`)
+- `BodyTooLargeResponse`: the response to reply with when an input body is too large (gives more control than the simpler `BodyTooLarge`)
 - `InvalidFormat`: the body to reply with when an input format is invalid (not valid json)
 - `InvalidFormatResponse`: the response to reply with when an input format is invalid (gives more control than the simpler `InvalidFormat`)
 - `InternalServerError`: the body to reply with when an error occurs

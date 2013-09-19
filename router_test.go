@@ -119,6 +119,15 @@ func TestHandlesANilResponse(t *testing.T) {
   assertResponse(t, res, 500, `{"error":"internal server error","code":500}`)
 }
 
+func TestHandlesBodiesLargerThanAllowed(t *testing.T) {
+  f := func(context *TestContext) Response { return JsonResponse("", 200) }
+  c := Configure().Route(R("GET", "v1", "worms", f).BodyFactory(testBodyFactory)).ContextFactory(testContextFactory).Dispatcher(testDispatcher).BodyPool(3, 1)
+  req := gspec.Request().Url("/v1/worms/22w.json").Method("GET").BodyString(`{"hello":"World"}`).Req
+  res := httptest.NewRecorder()
+  newRouter(c).ServeHTTP(res, req)
+  assertResponse(t, res, 413, `{"error":"body too large","code":413}`)
+}
+
 func assertResponse(t *testing.T, res *httptest.ResponseRecorder, status int, raw string) {
   spec := gspec.New(t)
   spec.Expect(res.Code).ToEqual(status)

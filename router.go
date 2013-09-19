@@ -14,7 +14,7 @@ type Router struct {
 }
 
 func newRouter(c *Configuration) *Router {
-  bp := bytepool.New(c.bodyPoolSize, c.maxBodySize)
+  bp := bytepool.New(c.bodyPoolSize, int(c.maxBodySize))
   return &Router{c, bp}
 }
 
@@ -84,8 +84,15 @@ func (r *Router) loadBody(route *Route, req *http.Request) (interface{}, Respons
   body := route.BodyFactory()
   buffer := r.bodyPool.Checkout()
   defer buffer.Close()
-  if n, _ := buffer.ReadFrom(req.Body); n == 0 { return body, nil }
-  if err := json.Unmarshal(buffer.Bytes(), body); err != nil { return nil, r.invalidFormat }
+  if n, _ := buffer.ReadFrom(req.Body); n == 0 {
+    return body, nil
+  } else if n == r.maxBodySize {
+    return nil, r.bodyTooLarge
+  }
+  if err := json.Unmarshal(buffer.Bytes(), body); err != nil {
+    println(err.Error())
+    return nil, r.invalidFormat
+  }
   return body, nil
 }
 
