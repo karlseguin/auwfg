@@ -20,21 +20,24 @@ func newRouter(c *Configuration) *Router {
 func (r *Router) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
   route, params := r.loadRouteAndParams(req)
   if route == nil {
-    reply(writer, r.notFound)
+    r.reply(writer, r.notFound)
     return
   }
   bc := newBaseContext(route, params, req)
   if body, res := r.loadBody(route, req); res != nil {
-    reply(writer, res)
+    r.reply(writer, res)
     return
   } else {
     bc.Body = body
   }
   context := r.contextFactory(bc)
-  reply(writer, r.dispatcher(route, context))
+  r.reply(writer, r.dispatcher(route, context))
 }
 
-func reply(writer http.ResponseWriter, res Response) {
+func (r *Router) reply(writer http.ResponseWriter, res Response) {
+  if res == nil {
+    res = r.internalServerError
+  }
   h := writer.Header()
   for k, v := range res.Header() { h[k] = v }
   writer.WriteHeader(res.Status())

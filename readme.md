@@ -35,6 +35,8 @@ Possible configuration options are:
 - `NotFoundResponse`: the response to reply with when a route isn't found (gives more control than the simpler `NotFound`). Note that once set, this response is available as `auwfg.NotFound` for use in your own application
 - `InvalidFormat`: the body to reply with when an input format is invalid (not valid json)
 - `InvalidFormatResponse`: the response to reply with when an input format is invalid (gives more control than the simpler `InvalidFormat`)
+- `InternalServerError`: the body to reply with when an error occurs
+- `InternalServerErrorResponse`: the response to reply with when an error occurs (gives more control than the simpler `InternalServerError`). Note that once set, this response is available as `auwfg.InternalServerError` for use in your own application
 - `ContextFactory`: explained below
 - `Dispatcher`: explained below
 - `Route`: explained below
@@ -117,9 +119,7 @@ Sadly, type information is lost, in actions must currently cast the `BaseContext
 
 When no body is present, an empty instance is made available. If, however, there's an error parsing the input, and `InvalidFormat` is returned.
 
-
 ### Pool Size
 A [fixed-length byte pool](https://github.com/viki-org/bytepool) is used to parse input bodies. The size of this pool is configured with the `BodyPool` configuration method. For example, to specify a max input body size of 64K and to pre-allocate 512 slots, you'd use:
 
     c := auwfg.Configure().BodyPool(64 * 1024, 512)
-

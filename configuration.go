@@ -10,6 +10,7 @@ type Configuration struct {
   bodyPoolSize int
   notFound Response
   invalidFormat Response
+  internalServerError Response
   routes versions
   dispatcher Dispatcher
   contextFactory ContextFactory
@@ -29,6 +30,7 @@ func Configure() *Configuration{
     contextFactory: genericContextFactory,
     notFound: JsonResponse(`{"error":"not found","code":404}`, 404),
     invalidFormat: JsonResponse(`{"error":"invalid input format","code":400}`, 400),
+    internalServerError: JsonResponse(`{"error":"internal server error","code":500}`, 500),
   }
 }
 
@@ -53,6 +55,15 @@ func (c *Configuration) InvalidFormatResponse(r Response) *Configuration {
 
 func (c *Configuration) InvalidFormat(body string) *Configuration {
   return c.InvalidFormatResponse(JsonResponse(body, 400))
+}
+
+func (c *Configuration) InternalServerErrorResponse(r Response) *Configuration {
+  c.internalServerError = r
+  return c
+}
+
+func (c *Configuration) InternalServerError(body string) *Configuration {
+  return c.InternalServerErrorResponse(JsonResponse(body, 500))
 }
 
 func (c *Configuration) Dispatcher(d Dispatcher) *Configuration {

@@ -9,9 +9,12 @@ import (
 )
 
 var NotFound Response
+var InternalServerError Response
 
 func Run(config *Configuration) {
   NotFound = config.notFound
+  InternalServerError = config.internalServerError
+
   s := &http.Server{
     MaxHeaderBytes: 8192,
     Handler: newRouter(config),

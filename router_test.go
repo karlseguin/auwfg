@@ -110,14 +110,13 @@ func TestParsesABody(t *testing.T) {
   newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
 }
 
-func assertParam(t *testing.T, params *Params, resource, id, parentResource, parentId string) {
-  actual := Params{
-    Id: id,
-    Resource: resource,
-    ParentResource: parentResource,
-    ParentId: parentId,
-  }
-  gspec.New(t).Expect(*params).ToEqual(actual)
+func TestHandlesANilResponse(t *testing.T) {
+  f := func(context interface{}) Response { return nil }
+  c := Configure().Route(R("GET", "v1", "worms", f))
+  req := gspec.Request().Url("/v1/worms/22w.json").Method("GET").Req
+  res := httptest.NewRecorder()
+  newRouter(c).ServeHTTP(res, req)
+  assertResponse(t, res, 500, `{"error":"internal server error","code":500}`)
 }
 
 func assertResponse(t *testing.T, res *httptest.ResponseRecorder, status int, raw string) {
