@@ -7,6 +7,7 @@ import (
 
 func init() {
   Define("generic").Field("x").Message("whyuno")
+  InitInvalidPool(1, 1024)
 }
 
 func TestPanicsWhenValidationFailsForAnUnknownDefinition(t *testing.T) {

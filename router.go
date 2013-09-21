@@ -48,7 +48,7 @@ func (r *Router) reply(writer http.ResponseWriter, res Response, req *http.Reque
       log.Printf("%q 500", req.URL.String())
     }
   }
-
+  defer res.Close()
   h := writer.Header()
   for k, v := range res.Header() { h[k] = v }
   writer.WriteHeader(res.Status())

@@ -13,6 +13,7 @@ type Response interface {
   Status() int
   Body() []byte
   Header() http.Header
+  Close()
 }
 
 type NormalResponse struct {
@@ -32,6 +33,8 @@ func (r *NormalResponse) Body() []byte {
 func (r *NormalResponse) Header() http.Header {
   return r.H
 }
+
+func (r *NormalResponse) Close() {}
 
 func Json(raw string, s int) Response {
   b := []byte(raw)

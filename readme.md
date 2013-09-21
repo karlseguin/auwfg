@@ -39,11 +39,13 @@ Possible configuration options are:
 - `InvalidFormatResponse`: the response to reply with when an input format is invalid (gives more control than the simpler `InvalidFormat`)
 - `InternalServerError`: the body to reply with when an error occurs
 - `InternalServerErrorResponse`: the response to reply with when an error occurs (gives more control than the simpler `InternalServerError`). Note that once set, this response is available as `auwfg.InternalServerError` for use in your own application
-- `ContextFactory`: explained below
-- `Dispatcher`: explained below
-- `Route`: explained below
-- `BodyPool`: explained below
+- `ContextFactory`: [explained below](#cfd)
+- `Dispatcher`: [explained below](#cfd)
+- `Route`: [explained below](#routing)
+- `BodyPool`: [explained below](#bodypool)
+- `InvalidPool`: [explained below](#invalidpool)
 
+<a id="cfd"></a>
 ## ContextFactory and Dispatcher
 Having strongly-typed, application specific context relies on specifying a custom `ContextFactory` and `Dispatcher`.
 
@@ -75,6 +77,7 @@ Unfortunately, on its own, `ContextFactory` is not enough. While we've created a
 
 **Your** dispatcher knows that **your** actions take a parameter of type `Context`, and thus can safely cast both the action and the parameter. Also, the dispatcher is a great place to execute pre and post filters for all actions.
 
+<a id="routing"></a>
 ## Routing
 Routing is strict and configured via the `Route` method of the configuration. Every route must have a mimimum of 4 components:
 
@@ -122,23 +125,33 @@ Sadly, type information is lost; actions must currently cast the `BaseContext.Bo
 
 When no body is present, an empty instance is made available. If, however, there's an error parsing the input, and `InvalidFormat` is returned.
 
+<a id="bodypool"></a>
 ### Pool Size
 A [fixed-length byte pool](https://github.com/viki-org/bytepool) is used to parse input bodies. The size of this pool is configured with the `BodyPool` configuration method. For example, to specify a max input body size of 64K and to pre-allocate 512 slots, you'd use:
 
-    c := auwfg.Configure().BodyPool(64 * 1024, 512)
+    c := auwfg.Configure().BodyPool(512, 64 * 1024)
 
 While the maximum size of the body is fixed (64K with the above configuration), the number of available buffers (512 above) will grow as needed.
 
-### Responses
+## Responses
 A `auwfg.Response` must implement three members:
 
 - `Body() []byte`
 - `Status() int`
 - `Header() http.Header`
+- `Close()`
 
 The `Json(body string, status int)` helper should prove helpful.
 
 The `Fatal(err error)` helper should be used when an `InternalServerError` should be returned and an error logged (using the standard logger)
+
+### Closing Responses
+The reason for responses to implement `Close` is to make it possible to use buffer pools when generating responses. If you're creating your own `Response`, it would not be unusual for `Close` to do nothing. Furthermore, under normal conditions, AUWFG will take care of closing responses. However, if you intercept a `auwfg.Response` and return a different response, you should call `Close()` on it. For example:
+
+    if res, valid := validate(input); valid == false {
+      res.Close() // <- since auwfg will never see this response, you need to take care of closing it yourself
+      return Json("why?!")
+    }
 
 ## Validation
 AUWFG has some basic input validation facilities. Validation works in two phases. The first phase is to define error messages. The second phase is to validate the actual data:
@@ -182,3 +195,11 @@ Calling `AddError(definitionId string)` is currently the only way to have "custo
       ...
       return validator.Response()
     }
+
+<a id="invalidpool"></a>
+### Pool Size
+A [fixed-length byte pool](https://github.com/viki-org/bytepool) is used to generate validation response. The size of this pool is configured with the `InvalidPool` configuration method. For example, to specify a max response size of 32 and to pre-allocate 256 slots, you'd use:
+
+    c := auwfg.Configure().InvalidPool(256, 32 * 1024)
+
+While the maximum size is fixed (32K with the above configuration), the number of available buffers (256 above) will grow as needed.

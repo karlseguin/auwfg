@@ -6,6 +6,7 @@ import (
   "net"
   "time"
   "net/http"
+  "auwfg/validation"
 )
 
 var NotFound = Json(`{"error":"not found","code":404}`, 404)
@@ -14,6 +15,7 @@ var InternalServerError = Json(`{"error":"internal server error","code":500}`, 5
 func Run(config *Configuration) {
   NotFound = config.notFound
   InternalServerError = config.internalServerError
+  validation.InitInvalidPool(config.invalidPoolSize, config.maxInvalidSize)
 
   s := &http.Server{
     MaxHeaderBytes: 8192,

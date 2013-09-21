@@ -6,8 +6,10 @@ import (
 
 type Configuration struct {
   address string
-  maxBodySize int64
   bodyPoolSize int
+  maxBodySize int64
+  invalidPoolSize int
+  maxInvalidSize int
   notFound Response
   bodyTooLarge Response
   invalidFormat Response
@@ -25,8 +27,10 @@ func Configure() *Configuration{
   return &Configuration{
     routes: make(versions),
     address: "127.0.0.1:4577",
-    maxBodySize: 32769,
     bodyPoolSize: 1024,
+    maxBodySize: 32769,
+    invalidPoolSize: 1024,
+    maxInvalidSize: 32769,
     dispatcher: genericDispatcher,
     contextFactory: genericContextFactory,
     notFound: NotFound,
@@ -87,9 +91,15 @@ func (c *Configuration) ContextFactory(cf ContextFactory) *Configuration {
   return c
 }
 
-func (c *Configuration) BodyPool(maxBodySize int, poolSize int) *Configuration {
+func (c *Configuration) BodyPool(poolSize int, bufferSize int) *Configuration {
   c.bodyPoolSize = poolSize
-  c.maxBodySize = int64(maxBodySize + 1)
+  c.maxBodySize = int64(bufferSize + 1)
+  return c
+}
+
+func (c *Configuration) InvalidPool(poolSize int, bufferSize int) *Configuration {
+  c.invalidPoolSize = poolSize
+  c.maxInvalidSize = bufferSize
   return c
 }
 
