@@ -7,7 +7,7 @@ import (
   "github.com/viki-org/bytepool"
 )
 
-var invalidBytePool = bytepool.New(1, 32 * 1024)
+var invalidBytePool = bytepool.New(1, 1024)
 // more than a little ugly...
 func InitInvalidPool(poolSize, bufferSize int) {
   invalidBytePool = bytepool.New(poolSize, bufferSize)
