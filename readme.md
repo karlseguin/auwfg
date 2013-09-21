@@ -126,6 +126,8 @@ A [fixed-length byte pool](https://github.com/viki-org/bytepool) is used to pars
 
     c := auwfg.Configure().BodyPool(64 * 1024, 512)
 
+While the maximum size of the body is fixed (64K with the above configuration), the number of available buffers (512 above) will grow as needed.
+
 ### Responses
 A `auwfg.Response` must implement three members:
 
@@ -136,3 +138,46 @@ A `auwfg.Response` must implement three members:
 The `Json(body string, status int)` helper should prove helpful.
 
 The `Fatal(err error)` helper should be used when an `InternalServerError` should be returned and an error logged (using the standard logger)
+
+## Validation
+AUWFG has some basic input validation facilities. Validation works in two phases. The first phase is to define error message. The second phase is to validate the actual data:
+
+    func init() {
+      auwfg.Define("required_username").Field("username").Message("Username is required")
+    }
+
+    func Create(context *Context) auwfg.Response {
+      input := context.Body.(*LoginInput)
+      if res, valid := validate(input); valid == false {
+        return res
+      }
+      ...
+    }
+
+    func validate(input *LoginInput) (auwfg.Response, bool) {
+      validator := auwfg.Validator()
+      validator.Required(input.UserName, "required_username")
+      return validator.Response()
+    }
+
+The last parameter of every validation function is the `definitionId`. The `definitionId` maps to the parameter given to `Define`. If the `definitionId` was not `Defined`, the validation will panic.
+
+The following validation methods are currently support:
+
+- Required(s, definitionId string)
+- Len(s string, min, max int, definitionId string)
+- MinLen(s string, min int, definitionId string)
+- MaxLen(s string, max int, definitionId string)
+- Same(a, b string, definitionId string)
+
+In addition to calling `Response`, which returns `(auwfg.Response, bool)`, `IsValid() bool` is also available.
+
+### Custom Validation
+Calling `AddError(definitionId string)` is currently the only way to have "custom errors":
+
+    func validate(input *LoginInput) (auwfg.Response, bool) {
+      validator := auwfg.Validator()
+      if isTooCool(input) { validator.AddError("too_cool") }
+      ...
+      return validator.Response()
+    }

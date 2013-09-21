@@ -39,13 +39,13 @@ func (r *Router) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 
 func (r *Router) reply(writer http.ResponseWriter, res Response, req *http.Request) {
   if res == nil {
-    log.Printf("%q \t nil response", req.URL.String())
+    log.Printf("%q nil response", req.URL.String())
     res = r.internalServerError
   } else  if res.Status() == 500 {
     if fatal, ok := res.(*FatalResponse); ok {
-      log.Printf("%q \t %v", req.URL.String(), fatal.err)
+      log.Printf("%q %v", req.URL.String(), fatal.err)
     } else {
-      log.Printf("%q \t 500", req.URL.String())
+      log.Printf("%q 500", req.URL.String())
     }
   }
 
@@ -99,7 +99,6 @@ func (r *Router) loadBody(route *Route, req *http.Request) (interface{}, Respons
     return nil, r.bodyTooLarge
   }
   if err := json.Unmarshal(buffer.Bytes(), body); err != nil {
-    println(err.Error())
     return nil, r.invalidFormat
   }
   return body, nil
