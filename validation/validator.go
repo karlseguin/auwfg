@@ -44,7 +44,7 @@ func (v *Validator) IsValid() bool {
 
 func (v *Validator) Response() (*InvalidResponse, bool) {
   if v.Errors == nil { return nil, true }
-  return newResponse(v.Errors), false
+  return NewResponse(v.Errors), false
 }
 
 func (v *Validator) AddError(definitionId string) {

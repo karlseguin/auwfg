@@ -17,7 +17,7 @@ type InvalidResponse struct {
   buffer *bytepool.Item
 }
 
-func newResponse(errors map[string][]*Definition) *InvalidResponse {
+func NewResponse(errors map[string][]*Definition) *InvalidResponse {
   buffer := invalidBytePool.Checkout()
   //am I really doing this in a public repo?!
   buffer.WriteByte(byte('{'))

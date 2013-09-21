@@ -8,7 +8,7 @@ import (
 func TestGeneratesaProperJsonMessage(t *testing.T) {
   InitInvalidPool(1, 1024)
   spec := gspec.New(t)
-  response := newResponse(map[string][]*Definition {
+  response := NewResponse(map[string][]*Definition {
     "usern\"ame": []*Definition {
       Define("un.req").Field("username").Message("username is required"),
       Define("un.dupe").Field("username").Message("username is already taken"),
@@ -25,7 +25,7 @@ func TestGeneratesaProperJsonMessage(t *testing.T) {
 func TestCloseReleasesTheBuffer(t *testing.T) {
   InitInvalidPool(2, 1024)
   spec := gspec.New(t)
-  response := newResponse(map[string][]*Definition {
+  response := NewResponse(map[string][]*Definition {
     "password": []*Definition {
       Define("pw.len").Field("password").Message("is too\", short"),
     },
