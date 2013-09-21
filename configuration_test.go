@@ -12,7 +12,7 @@ func TestSetsTheAddress(t *testing.T) {
 
 func TestSetsTheNotFoundResponse(t *testing.T) {
   spec := gspec.New(t)
-  expected := JsonResponse("the res", 244)
+  expected := Json("the res", 244)
   actual := Configure().NotFoundResponse(expected).notFound
   spec.Expect(actual.Status()).ToEqual(244)
   spec.Expect(string(actual.Body())).ToEqual("the res")

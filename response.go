@@ -33,7 +33,7 @@ func (r *NormalResponse) Header() http.Header {
   return r.H
 }
 
-func JsonResponse(raw string, s int) Response {
+func Json(raw string, s int) Response {
   b := []byte(raw)
   return &NormalResponse{
     S: s,
