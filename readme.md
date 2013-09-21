@@ -23,7 +23,7 @@ Ultimately, these goals result in actions which are clean, testable and look lik
     }
 
 ## Configuration
-You can start the server, using default settings, by calling `auwfg.Run(auwfg.Configure())`. However, `Configure()` exposes a fluent interface which lets specify various settings:
+You can start the server, using default settings, by calling `auwfg.Run(auwfg.Configure())`. However, `Configure()` exposes a fluent interface which lets you specify various settings:
 
     c := auwfg.Configure().Address("127.0.0.1:3944").NotFound('{"error":404}')
     auwfg.Run(c)
@@ -52,6 +52,7 @@ The `ContextFactory` takes an instance of `*auwfg.BaseContext` and returns whate
     type Context struct {
       User *User
       // more app-specific fields
+      // ...
       *auwfg.BaseContext
     }
 
@@ -62,7 +63,7 @@ The `ContextFactory` takes an instance of `*auwfg.BaseContext` and returns whate
     c := auwfg.Configure().ContextFactory(ContextFactory)
     auwfg.Run(c)
 
-Unfortunately, on its own, `ContextFactory` is not enough. While we've created a specific type, said type information is unknown to AUWFG itself. Rather than having each of action deal with typeless data, we use a custom `Dispatcher`:
+Unfortunately, on its own, `ContextFactory` is not enough. While we've created a specific type, said type information is unknown to AUWFG itself. Rather than having each action deal with typeless data, we use a custom `Dispatcher`:
 
     func Dispatcher(route *auwfg.Route, context interface{}) auwfg.Response {
       //you probably won't need to do anything with route
@@ -72,7 +73,7 @@ Unfortunately, on its own, `ContextFactory` is not enough. While we've created a
     c := auwfg.Configure().ContextFactory(ContextFactory).Dispatcher(Dispatcher)
     auwfg.Run(c)
 
-**Your** dispatcher knows that **your** actions take a parameter of type `Context`, and thus can safely cast both the action and the parameter.
+**Your** dispatcher knows that **your** actions take a parameter of type `Context`, and thus can safely cast both the action and the parameter. Also, the dispatcher is a great place to execute pre and post filters for all actions.
 
 ## Routing
 Routing is strict and configured via the `Route` method of the configuration. Every route must have a mimimum of 4 components:
@@ -101,9 +102,9 @@ The first three are `strings`, the last is the action handler. Let's look at som
     //matches DELETE /v1/gholas/SOMEID.ext
     c.Route(auwfg.R("DELETE", "v1", "gholas", gholas.Delete))
 
-Note that the method for a `GET` with no id is called `LIST`. The `gholas.List|Show|Create|Update|Delete` actions are any function which can be invoked by your dispatcher.
+Note that the method for a `GET` with no id is called `LIST`. The `gholas.List|Show|Create|Update|Delete` actions are function which can be invoked by your dispatcher.
 
-The captured parameters, "v1", "gholas" and "SOMEID" are available in the BaseContext.Params (Version, Resource and Id fields respectively), which you've hopefully preserved in your own context.
+The captured parameters, "v1", "gholas" and "SOMEID" are available in the `BaseContext.Params` (`Version`, `Resourc`e and `Id` fields respectively), which you've hopefully preserved in your own context.
 
 ## Parsing Request Bodies
 Any route can have an associated `BodyFactory`, configured as:
@@ -112,7 +113,7 @@ Any route can have an associated `BodyFactory`, configured as:
 
 A `BodyFactory` simply returns an instance of an object which will be used with the `encoding/json` package to convert the request body into the desired input.
 
-Sadly, type information is lost, in actions must currently cast the `BaseContext.Body` to the appropriate type:
+Sadly, type information is lost; actions must currently cast the `BaseContext.Body` to the appropriate type:
 
     func Create(context *Context) auwfg.Response {
       input := context.Body.(*GholaInput)
@@ -140,7 +141,7 @@ The `Json(body string, status int)` helper should prove helpful.
 The `Fatal(err error)` helper should be used when an `InternalServerError` should be returned and an error logged (using the standard logger)
 
 ## Validation
-AUWFG has some basic input validation facilities. Validation works in two phases. The first phase is to define error message. The second phase is to validate the actual data:
+AUWFG has some basic input validation facilities. Validation works in two phases. The first phase is to define error messages. The second phase is to validate the actual data:
 
     func init() {
       auwfg.Define("required_username").Field("username").Message("Username is required")
@@ -164,11 +165,11 @@ The last parameter of every validation function is the `definitionId`. The `defi
 
 The following validation methods are currently support:
 
-- Required(s, definitionId string)
-- Len(s string, min, max int, definitionId string)
-- MinLen(s string, min int, definitionId string)
-- MaxLen(s string, max int, definitionId string)
-- Same(a, b string, definitionId string)
+- `Required(s, definitionId string)`
+- `Len(s string, min, max int, definitionId string)`
+- `MinLen(s string, min int, definitionId string)`
+- `MaxLen(s string, max int, definitionId string)`
+- `Same(a, b string, definitionId string)`
 
 In addition to calling `Response`, which returns `(auwfg.Response, bool)`, `IsValid() bool` is also available.
 
