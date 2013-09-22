@@ -74,7 +74,11 @@ func (r *Router) loadRouteAndParams(req *http.Request) (*Route, *Params) {
   if exists == false { return nil, nil }
 
   params := loadParams(parts[1:])
-  controller, exists := version[params.Resource]
+  var fullResource = params.Resource
+  if len(params.ParentResource) > 0  {
+    fullResource = params.ParentResource + ":" + fullResource
+  }
+  controller, exists := version[fullResource]
   if exists == false { return nil, nil }
 
   m := req.Method

@@ -70,6 +70,22 @@ func TestExecutesAPutAction(t *testing.T) {
   assertResponse(t, res, 200, `{"name":"shaihulud"}`)
 }
 
+func TestRoutesToANestedResource(t *testing.T) {
+  spec := gspec.New(t)
+  f := func(context interface{}) Response {
+    spec.Expect(context.(*BaseContext).Params.ParentResource).ToEqual("gholas")
+    spec.Expect(context.(*BaseContext).Params.ParentId).ToEqual("123g")
+    spec.Expect(context.(*BaseContext).Params.Resource).ToEqual("history")
+    spec.Expect(context.(*BaseContext).Params.Id).ToEqual("")
+    return Json(`{"name":"history"}`, 200)
+  }
+  req := gspec.Request().Url("/v2/gholas/123g/history.json").Req
+  res := httptest.NewRecorder()
+  router := newRouter(Configure().Route(R("LIST", "v2", "history", f).Parent("gholas")))
+  router.ServeHTTP(res, req)
+  assertResponse(t, res, 200, `{"name":"history"}`)
+}
+
 func TestCreatingAndDispatchingThroughCustomTypes(t *testing.T) {
   spec := gspec.New(t)
   f := func(context *TestContext) Response {
@@ -133,7 +149,7 @@ func TestParsesQueryString(t *testing.T) {
   f := func(context *TestContext) Response {
     spec.Expect(context.Query["app"]).ToEqual("6003")
     spec.Expect(context.Query["t"]).ToEqual("1 2")
-    return nil
+    return Json("", 200)
   }
   c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json?APP=6003&t=1%202&").Req
@@ -144,7 +160,7 @@ func TestParsesQueryStirngWithEmptyPairAtTheStart(t *testing.T) {
   spec := gspec.New(t)
   f := func(context *TestContext) Response {
     spec.Expect(context.Query["app"]).ToEqual("100004a")
-    return nil
+    return Json("", 200)
   }
   c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json?&app=100004a").Method("GET").Req
@@ -156,7 +172,7 @@ func TestParsesQueryStirngWithEmptyPairInTheMiddle(t *testing.T) {
   f := func(context *TestContext) Response {
     spec.Expect(context.Query["app"]).ToEqual("100004a")
     spec.Expect(context.Query["t"]).ToEqual("1")
-    return nil
+    return Json("", 200)
   }
   c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json?app=100004a&&t=1").Method("GET").Req
@@ -167,7 +183,7 @@ func TestHandlesMultipleQuestionMarksInQueryString(t *testing.T) {
   spec := gspec.New(t)
   f := func(context *TestContext) Response {
     spec.Expect(context.Query["app"]).ToEqual("100005a")
-    return nil
+    return Json("", 200)
   }
   c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json?app=100002a?app=100005a").Method("GET").Req
@@ -178,7 +194,7 @@ func TestParsesAQueryStringWithAMissingValue(t *testing.T) {
   spec := gspec.New(t)
   f := func(context *TestContext) Response {
     spec.Expect(len(context.Query)).ToEqual(0)
-    return nil
+    return Json("", 200)
   }
   c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json?a").Method("GET").Req
@@ -189,7 +205,7 @@ func TestParsesAQueryStringWithAMissingValue2(t *testing.T) {
   spec := gspec.New(t)
   f := func(context *TestContext) Response {
     spec.Expect(context.Query["b"]).ToEqual("")
-    return nil
+    return Json("", 200)
   }
   c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json?b=").Method("GET").Req

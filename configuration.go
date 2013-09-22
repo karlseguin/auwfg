@@ -106,10 +106,13 @@ func (c *Configuration) InvalidPool(poolSize int, bufferSize int) *Configuration
 func (c *Configuration) Route(r *RouteBuilder) *Configuration {
   r.method = strings.ToUpper(r.method)
   r.version = strings.ToLower(r.version)
-  r.resource = strings.ToLower(r.resource)
+  fullResource := strings.ToLower(r.resource)
+  if len(r.parentResource) > 0 {
+    fullResource = strings.ToLower(r.parentResource) + ":" + fullResource
+  }
   if _, exists := c.routes[r.version]; !exists { c.routes[r.version] = make(controllers) }
-  if _, exists := c.routes[r.version][r.resource]; !exists { c.routes[r.version][r.resource] = make(actions) }
-  c.routes[r.version][r.resource][r.method] = &Route{
+  if _, exists := c.routes[r.version][fullResource]; !exists { c.routes[r.version][fullResource] = make(actions) }
+  c.routes[r.version][fullResource][r.method] = &Route{
     Action: r.action,
     BodyFactory: r.bf,
   }

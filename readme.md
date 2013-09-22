@@ -109,6 +109,15 @@ Note that the method for a `GET` with no id is called `LIST`. The `gholas.List|S
 
 The captured parameters, "v1", "gholas" and "SOMEID" are available in the `BaseContext.Params` (`Version`, `Resourc`e and `Id` fields respectively), which you've hopefully preserved in your own context.
 
+### Nested Routes
+A nested route, is configured by specifying the route's `Parent`:
+
+    c.Route(auwfg.R("LIST", "v1", "history", gholas.Show).Parent("gholas"))
+
+Will match `GET /v1/gholas/SOMEID/history.json`
+
+`SOMEID` is available in `Params.ParentId`
+
 ## Parsing Request Bodies
 Any route can have an associated `BodyFactory`, configured as:
 
@@ -144,6 +153,8 @@ A `auwfg.Response` must implement three members:
 The `Json(body string, status int)` helper should prove helpful.
 
 The `Fatal(err error)` helper should be used when an `InternalServerError` should be returned and an error logged (using the standard logger)
+
+The `auwfg.Deleted` variable is a response which returns 204 and a content-length of 0
 
 ### Closing Responses
 The reason for responses to implement `Close` is to make it possible to use buffer pools when generating responses. If you're creating your own `Response`, it would not be unusual for `Close` to do nothing. Furthermore, under normal conditions, AUWFG will take care of closing responses. However, if you intercept a `auwfg.Response` and return a different response, you should call `Close()` on it. For example:
