@@ -11,6 +11,7 @@ import (
 
 var NotFound = Json(`{"error":"not found","code":404}`, 404)
 var InternalServerError = Json(`{"error":"internal server error","code":500}`, 500)
+var Deleted = &NormalResponse{204, []byte{}, http.Header{"Content-Length": []string{"0"}}}
 
 func Run(config *Configuration) {
   NotFound = config.notFound
