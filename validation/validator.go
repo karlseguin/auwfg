@@ -12,29 +12,29 @@ func New() *Validator {
   return new(Validator)
 }
 
-func (v *Validator) Required(value, definition string) *Validator {
-  if len(value) == 0 { v.AddError(definition) }
+func (v *Validator) Required(value, definitionId string) *Validator {
+  if len(value) == 0 { v.AddError(definitionId) }
   return v
 }
 
-func (v *Validator) Len(value string, min, max int, definition string) *Validator {
+func (v *Validator) Len(value string, min, max int, definitionId string) *Validator {
   l := len(value)
-  if l < min || l > max { v.AddError(definition) }
+  if l < min || l > max { v.AddError(definitionId) }
   return v
 }
 
-func (v *Validator) MinLen(value string, min int, definition string) *Validator {
-  if len(value) < min { v.AddError(definition) }
+func (v *Validator) MinLen(value string, min int, definitionId string) *Validator {
+  if len(value) < min { v.AddError(definitionId) }
   return v
 }
 
-func (v *Validator) MaxLen(value string, max int, definition string) *Validator {
-  if len(value) > max { v.AddError(definition) }
+func (v *Validator) MaxLen(value string, max int, definitionId string) *Validator {
+  if len(value) > max { v.AddError(definitionId) }
   return v
 }
 
-func (v *Validator) Same(a, b, definition string) *Validator {
-  if a != b { v.AddError(definition) }
+func (v *Validator) Same(a, b, definitionId string) *Validator {
+  if a != b { v.AddError(definitionId) }
   return v
 }
 

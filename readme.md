@@ -168,7 +168,7 @@ The reason for responses to implement `Close` is to make it possible to use buff
 AUWFG has some basic input validation facilities. Validation works in two phases. The first phase is to define error messages. The second phase is to validate the actual data:
 
     func init() {
-      auwfg.Define("required_username").Field("username").Message("Username is required")
+      auwfg.Define("required_username", "username", "Username is required")
     }
 
     func Create(context *Context) auwfg.Response {
@@ -199,6 +199,10 @@ In addition to calling `Response`, which returns `(auwfg.Response, bool)`, `IsVa
 
 ### Custom Validation
 Calling `AddError(definitionId string)` is currently the only way to have "custom errors":
+
+    func init() {
+      auwfg.Define("too_cool", "username", "username is too cool")
+    }
 
     func validate(input *LoginInput) (auwfg.Response, bool) {
       validator := auwfg.Validator()

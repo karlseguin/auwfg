@@ -8,19 +8,12 @@ type Definition struct {
   message string
 }
 
-func Define(id string) *Definition {
-  definition := &Definition{id: id,}
+func Define(id, field, message string) *Definition {
+  definition := &Definition{
+    id: id,
+    field: field,
+    message: message,
+  }
   definitions[id] = definition
   return definition
-
-}
-
-func (d *Definition) Field(field string) *Definition {
-  d.field = field
-  return d
-}
-
-func (d *Definition) Message(message string) *Definition {
-  d.message = message
-  return d
 }
