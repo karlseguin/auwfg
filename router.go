@@ -129,7 +129,6 @@ func loadParams(parts []string) *Params {
   return params
 }
 
-
 func loadQuery(raw string) map[string]string {
   l := len(raw)
   if l == 0 { return nil }

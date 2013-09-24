@@ -10,11 +10,11 @@ func TestGeneratesaProperJsonMessage(t *testing.T) {
   spec := gspec.New(t)
   response := NewResponse(map[string][]*Definition {
     "usern\"ame": []*Definition {
-      Define("un.req").Field("username").Message("username is required"),
-      Define("un.dupe").Field("username").Message("username is already taken"),
+      Define("un.req", "username", "username is required"),
+      Define("un.dupe", "username", "username is already taken"),
     },
     "password": []*Definition {
-      Define("pw.len").Field("password").Message("is too\", short"),
+      Define("pw.len", "password","is too\", short"),
     },
   })
   spec.Expect(string(response.Body())).ToEqual(`{"usern\"ame":["username is required","username is already taken"],"password":["is too\", short"]}`)
@@ -27,7 +27,7 @@ func TestCloseReleasesTheBuffer(t *testing.T) {
   spec := gspec.New(t)
   response := NewResponse(map[string][]*Definition {
     "password": []*Definition {
-      Define("pw.len").Field("password").Message("is too\", short"),
+      Define("pw.len", "password", "is too\", short"),
     },
   })
   spec.Expect(invalidBytePool.Len()).ToEqual(1)

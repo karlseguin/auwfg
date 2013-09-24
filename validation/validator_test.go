@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-  Define("generic").Field("x").Message("whyuno")
+  Define("generic", "x", "whyuno")
   InitInvalidPool(1, 1024)
 }
 
