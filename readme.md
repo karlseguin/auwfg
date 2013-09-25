@@ -197,10 +197,12 @@ Rules, such as the above `RequiredRule` and `MinLenRule` implement the `validati
 
 The following validation methods are currently support:
 
-- `Required(s, definitionId string)`
-- `Len(s string, min, max int, definitionId string)`
-- `MinLen(s string, min int, definitionId string)`
-- `MaxLen(s string, max int, definitionId string)`
+- `Required()`
+- `Len(min, max int)`
+- `MinLen(min int)`
+- `MaxLen(max int)`
+- `Pattern(p *regexp.Pattern)`
+- `Email()` (\S+@\S+\.\S+)
 
 In addition to calling `Response`, which returns `(auwfg.Response, bool)`, `IsValid() bool` is also available.
 
