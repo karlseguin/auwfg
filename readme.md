@@ -165,10 +165,17 @@ The reason for responses to implement `Close` is to make it possible to use buff
     }
 
 ## Validation
-AUWFG has some basic input validation facilities. Validation works in two phases. The first phase is to define error messages. The second phase is to validate the actual data:
+AUWFG has some basic input validation facilities. Validation works in two phases. The first phase is to define rules. The second phase is to validate the actual data:
+
+    import (
+      "github.com/viki-org/auwfg"
+      "github.com/viki-org/auwfg/validation"
+    )
 
     func init() {
-      auwfg.Define("required_username", "username", "Username is required")
+      // definition id, field name, error message, vadation.Rule object
+      auwfg.Define("user.username", "username", "Username is required", validation.Required())
+      auwfg.Define("user.password", "password", "Password must be 6 or more characters", validation.MinLen(6))
     }
 
     func Create(context *Context) auwfg.Response {
@@ -181,11 +188,12 @@ AUWFG has some basic input validation facilities. Validation works in two phases
 
     func validate(input *LoginInput) (auwfg.Response, bool) {
       validator := auwfg.Validator()
-      validator.Required(input.UserName, "required_username")
+      validator.Validate(input.UserName, "user.username")
+      validator.Validate(input.Password, "user.password")
       return validator.Response()
     }
 
-The last parameter of every validation function is the `definitionId`. The `definitionId` maps to the parameter given to `Define`. If the `definitionId` was not `Defined`, the validation will panic.
+Rules, such as the above `RequiredRule` and `MinLenRule` implement the `validation.Rule` interface. This interface defines a single method: `Verify(value interface{}) bool`.
 
 The following validation methods are currently support:
 
@@ -193,23 +201,8 @@ The following validation methods are currently support:
 - `Len(s string, min, max int, definitionId string)`
 - `MinLen(s string, min int, definitionId string)`
 - `MaxLen(s string, max int, definitionId string)`
-- `Same(a, b string, definitionId string)`
 
 In addition to calling `Response`, which returns `(auwfg.Response, bool)`, `IsValid() bool` is also available.
-
-### Custom Validation
-Calling `AddError(definitionId string)` is currently the only way to have "custom errors":
-
-    func init() {
-      auwfg.Define("too_cool", "username", "username is too cool")
-    }
-
-    func validate(input *LoginInput) (auwfg.Response, bool) {
-      validator := auwfg.Validator()
-      if isTooCool(input) { validator.AddError("too_cool") }
-      ...
-      return validator.Response()
-    }
 
 <a id="invalidpool"></a>
 ### Pool Size

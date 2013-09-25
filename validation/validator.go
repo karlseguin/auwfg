@@ -4,6 +4,10 @@ import(
   "fmt"
 )
 
+type Rule interface {
+  Verify(value interface{}) bool
+}
+
 type Validator struct {
   Errors map[string][]*Definition
 }
@@ -12,30 +16,14 @@ func New() *Validator {
   return new(Validator)
 }
 
-func (v *Validator) Required(value, definitionId string) *Validator {
-  if len(value) == 0 { v.AddError(definitionId) }
-  return v
-}
-
-func (v *Validator) Len(value string, min, max int, definitionId string) *Validator {
-  l := len(value)
-  if l < min || l > max { v.AddError(definitionId) }
-  return v
-}
-
-func (v *Validator) MinLen(value string, min int, definitionId string) *Validator {
-  if len(value) < min { v.AddError(definitionId) }
-  return v
-}
-
-func (v *Validator) MaxLen(value string, max int, definitionId string) *Validator {
-  if len(value) > max { v.AddError(definitionId) }
-  return v
-}
-
-func (v *Validator) Same(a, b, definitionId string) *Validator {
-  if a != b { v.AddError(definitionId) }
-  return v
+func (v *Validator) Validate(value interface{}, definitionId string) bool {
+  definition, exists := definitions[definitionId]
+  if exists == false { panic(fmt.Sprintf("unknown definition %v", definitionId))}
+  valid := definition.rule.Verify(value)
+  if valid == false {
+    v.AddError(definitionId)
+  }
+  return valid
 }
 
 func (v *Validator) IsValid() bool {
