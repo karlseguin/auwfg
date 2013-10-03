@@ -19,7 +19,7 @@ Ultimately, these goals result in actions which are clean, testable and look lik
       remember := input.LongLived
 
       //or create your own response types
-      return auwfg.Json(`{"token":"blah"`}, 201)
+      return auwfg.Json(`{"token":"blah"}`, 201)
     }
 
 ## Configuration
