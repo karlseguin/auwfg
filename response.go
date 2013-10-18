@@ -1,8 +1,10 @@
 package auwfg
 
 import (
+  "errors"
   "strconv"
   "net/http"
+  "github.com/viki-org/bytepool"
 )
 
 var (
@@ -36,12 +38,32 @@ func (r *NormalResponse) Header() http.Header {
 
 func (r *NormalResponse) Close() {}
 
-func Json(raw string, s int) Response {
-  b := []byte(raw)
+func Json(body interface{}, status int) Response {
+  switch b := body.(type) {
+  case string:
+    return normalResponse([]byte(b), status)
+  case []byte:
+    return normalResponse(b, status)
+  case *bytepool.Item:
+    return closableResponse(b, status)
+  default:
+    return Fatal(errors.New("unknown body type"))
+  }
+}
+
+func normalResponse(b []byte, status int) Response {
   return &NormalResponse{
-    S: s,
+    S: status,
     B: b,
     H: http.Header{"Content-Type": JsonHeader, "Content-Length": []string{strconv.Itoa(len(b))}},
+  }
+}
+
+func closableResponse(b *bytepool.Item, s int) Response {
+  return &ClosableResponse{
+    S: s,
+    B: b,
+    H: http.Header{"Content-Type": JsonHeader, "Content-Length": []string{strconv.Itoa(b.Len())}},
   }
 }
 
