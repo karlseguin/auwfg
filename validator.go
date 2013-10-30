@@ -1,7 +1,7 @@
 package auwfg
 
 import (
-  "auwfg/validation"
+  "github.com/viki-org/auwfg/validation"
 )
 
 func Validator() *validation.Validator {

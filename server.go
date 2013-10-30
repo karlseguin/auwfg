@@ -6,7 +6,7 @@ import (
   "net"
   "time"
   "net/http"
-  "auwfg/validation"
+  "github.com/viki-org/auwfg/validation"
 )
 
 var NotFound = Json(`{"error":"not found","code":404}`, 404)
