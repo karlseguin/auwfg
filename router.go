@@ -26,11 +26,9 @@ func (r *Router) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
     return
   }
   bc := newBaseContext(route, params, req)
-  if body, res := r.loadBody(route, req); res != nil {
+  if res := r.loadBody(route, req, bc); res != nil {
     r.reply(writer, res, req)
     return
-  } else {
-    bc.Body = body
   }
   bc.Query = loadQuery(req.URL.RawQuery)
   context := r.contextFactory(bc)
@@ -90,22 +88,28 @@ func (r *Router) loadRouteAndParams(req *http.Request) (*Route, *Params) {
   params.Version = parts[0]
   return route, params
 }
-func (r *Router) loadBody(route *Route, req *http.Request) (interface{}, Response) {
+func (r *Router) loadBody(route *Route, req *http.Request, context *BaseContext) Response {
   defer req.Body.Close()
-  if route.BodyFactory == nil { return nil, nil }
-
-  body := route.BodyFactory()
   buffer := r.bodyPool.Checkout()
   defer buffer.Close()
+  if route.BodyFactory != nil { context.Body = route.BodyFactory() }
+
   if n, _ := buffer.ReadFrom(req.Body); n == 0 {
-    return body, nil
+    return nil
   } else if n == r.maxBodySize {
-    return nil, r.bodyTooLarge
+    return r.bodyTooLarge
   }
-  if err := json.Unmarshal(buffer.Bytes(), body); err != nil {
-    return nil, r.invalidFormat
+  if r.loadRawBody {
+    context.RawBody = make([]byte, buffer.Len())
+    copy(context.RawBody, buffer.Bytes())
   }
-  return body, nil
+
+  if context.Body != nil {
+    if err := json.Unmarshal(buffer.Bytes(), context.Body); err != nil {
+      return r.invalidFormat
+    }
+  }
+  return nil
 }
 
 func loadParams(parts []string) *Params {
