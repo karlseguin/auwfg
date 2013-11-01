@@ -44,6 +44,7 @@ Possible configuration options are:
 - `Route`: [explained below](#routing)
 - `BodyPool`: [explained below](#bodypool)
 - `InvalidPool`: [explained below](#invalidpool)
+- `LoadRawBody`: The raw/unparsed body will be availble in the context (useful for debugging)
 
 <a id="cfd"></a>
 ## ContextFactory and Dispatcher
