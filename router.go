@@ -105,7 +105,7 @@ func (r *Router) loadBody(route *Route, req *http.Request, context *BaseContext)
   }
 
   if context.Body != nil {
-    if err := json.Unmarshal(context.RawBody, context.Body); err != nil {
+    if err := json.Unmarshal(buffer.Bytes(), context.Body); err != nil {
       return r.invalidFormat
     }
   }
