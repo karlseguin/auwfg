@@ -7,7 +7,7 @@ import (
 
 func TestCreatesAJsonResponse(t *testing.T) {
   spec := gspec.New(t)
-  r := Json("this is the body", 9001)
+  r := Json("this is the body").Status(9001).Response
   spec.Expect(string(r.Body())).ToEqual("this is the body")
   spec.Expect(r.Status()).ToEqual(9001)
   spec.Expect(len(r.Header())).ToEqual(2)

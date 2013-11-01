@@ -35,8 +35,8 @@ func Configure() *Configuration{
     contextFactory: genericContextFactory,
     notFound: NotFound,
     internalServerError: InternalServerError,
-    bodyTooLarge: Json(`{"error":"body too large","code":413}`, 413),
-    invalidFormat: Json(`{"error":"invalid input format","code":400}`, 400),
+    bodyTooLarge: Json(`{"error":"body too large","code":413}`).Status(413).Response,
+    invalidFormat: Json(`{"error":"invalid input format","code":400}`).Status(400).Response,
   }
 }
 
@@ -51,7 +51,7 @@ func (c *Configuration) NotFoundResponse(r Response) *Configuration {
 }
 
 func (c *Configuration) NotFound(body string) *Configuration {
-  return c.NotFoundResponse(Json(body, 404))
+  return c.NotFoundResponse(Json(body).Status(404).Response)
 }
 
 func (c *Configuration) BodyTooLargeResponse(r Response) *Configuration {
@@ -60,7 +60,7 @@ func (c *Configuration) BodyTooLargeResponse(r Response) *Configuration {
 }
 
 func (c *Configuration) BodyTooLarge(body string) *Configuration {
-  return c.BodyTooLargeResponse(Json(body, 413))
+  return c.BodyTooLargeResponse(Json(body).Status(413).Response)
 }
 
 func (c *Configuration) InvalidFormatResponse(r Response) *Configuration {
@@ -69,7 +69,7 @@ func (c *Configuration) InvalidFormatResponse(r Response) *Configuration {
 }
 
 func (c *Configuration) InvalidFormat(body string) *Configuration {
-  return c.InvalidFormatResponse(Json(body, 400))
+  return c.InvalidFormatResponse(Json(body).Status(400).Response)
 }
 
 func (c *Configuration) InternalServerErrorResponse(r Response) *Configuration {
@@ -78,7 +78,7 @@ func (c *Configuration) InternalServerErrorResponse(r Response) *Configuration {
 }
 
 func (c *Configuration) InternalServerError(body string) *Configuration {
-  return c.InternalServerErrorResponse(Json(body, 500))
+  return c.InternalServerErrorResponse(Json(body).Status(500).Response)
 }
 
 func (c *Configuration) Dispatcher(d Dispatcher) *Configuration {

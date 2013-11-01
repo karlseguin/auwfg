@@ -35,7 +35,7 @@ func TestNotFoundOnUnknownActions(t *testing.T) {
 }
 
 func TestExecutesAListAction(t *testing.T) {
-  f := func(context interface{}) Response {return Json(`{"spice":"mustflow"}`, 200)}
+  f := func(context interface{}) Response {return Json(`{"spice":"mustflow"}`).Response}
   req := gspec.Request().Url("/v4/sessions.json").Req
   res := httptest.NewRecorder()
   router := newRouter(Configure().Route(R("LIST", "v4", "sessions", f)))
@@ -44,7 +44,7 @@ func TestExecutesAListAction(t *testing.T) {
 }
 
 func TestExecutesAGetAction(t *testing.T) {
-  f := func(context interface{}) Response { return Json(`{"name":"duncan"}`, 200) }
+  f := func(context interface{}) Response { return Json(`{"name":"duncan"}`).Response }
   req := gspec.Request().Url("/v2/gholas/123g.json").Req
   res := httptest.NewRecorder()
   router := newRouter(Configure().Route(R("GET", "v2", "gholas", f)))
@@ -53,7 +53,7 @@ func TestExecutesAGetAction(t *testing.T) {
 }
 
 func TestExecutesAPostAction(t *testing.T) {
-  f := func(context interface{}) Response { return Json(`{"name":"shaihulud"}`, 200) }
+  f := func(context interface{}) Response { return Json(`{"name":"shaihulud"}`).Response }
   req := gspec.Request().Url("/v1/worms.json").Method("POST").Req
   res := httptest.NewRecorder()
   router := newRouter(Configure().Route(R("POST", "v1", "worms", f)))
@@ -62,7 +62,7 @@ func TestExecutesAPostAction(t *testing.T) {
 }
 
 func TestExecutesAPutAction(t *testing.T) {
-  f := func(context interface{}) Response { return Json(`{"name":"shaihulud"}`, 200) }
+  f := func(context interface{}) Response { return Json(`{"name":"shaihulud"}`).Response }
   req := gspec.Request().Url("/v1/worms/22w.json").Method("PUT").Req
   res := httptest.NewRecorder()
   router := newRouter(Configure().Route(R("PUT", "v1", "worms", f)))
@@ -77,7 +77,7 @@ func TestRoutesToANestedResource(t *testing.T) {
     spec.Expect(context.(*BaseContext).Params.ParentId).ToEqual("123g")
     spec.Expect(context.(*BaseContext).Params.Resource).ToEqual("history")
     spec.Expect(context.(*BaseContext).Params.Id).ToEqual("")
-    return Json(`{"name":"history"}`, 200)
+    return Json(`{"name":"history"}`).Response
   }
   req := gspec.Request().Url("/v2/gholas/123g/history.json").Req
   res := httptest.NewRecorder()
@@ -93,7 +93,7 @@ func TestCreatingAndDispatchingThroughCustomTypes(t *testing.T) {
     spec.Expect(context.Params.Version).ToEqual("v1")
     spec.Expect(context.Params.Resource).ToEqual("worms")
     spec.Expect(context.Params.Id).ToEqual("22w")
-    return Json(`{"name":"bigjohn"}`, 203)
+    return Json(`{"name":"bigjohn"}`).Status(203).Response
   }
   c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json").Method("GET").Req
@@ -107,7 +107,7 @@ func TestDefaulsTheBodyValueWhenNoBodyIsPresent(t *testing.T) {
   f := func(context *TestContext) Response {
     input := context.Body.(*TestBody)
     spec.Expect(input.Hello).ToEqual("")
-    return Json("", 200)
+    return Json("").Response
   }
   c := Configure().Route(R("GET", "v1", "worms", f).BodyFactory(testBodyFactory)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json").Method("GET").Req
@@ -119,7 +119,7 @@ func TestParsesABody(t *testing.T) {
   f := func(context *TestContext) Response {
     input := context.Body.(*TestBody)
     spec.Expect(input.Hello).ToEqual("World")
-    return Json("", 200)
+    return Json("").Response
   }
   c := Configure().Route(R("GET", "v1", "worms", f).BodyFactory(testBodyFactory)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json").Method("GET").BodyString(`{"hello":"World"}`).Req
@@ -136,7 +136,7 @@ func TestHandlesANilResponse(t *testing.T) {
 }
 
 func TestHandlesBodiesLargerThanAllowed(t *testing.T) {
-  f := func(context *TestContext) Response { return Json("", 200) }
+  f := func(context *TestContext) Response { return Json("").Response }
   c := Configure().Route(R("GET", "v1", "worms", f).BodyFactory(testBodyFactory)).ContextFactory(testContextFactory).Dispatcher(testDispatcher).BodyPool(3, 1)
   req := gspec.Request().Url("/v1/worms/22w.json").Method("GET").BodyString(`{"hello":"World"}`).Req
   res := httptest.NewRecorder()
@@ -149,7 +149,7 @@ func TestParsesQueryString(t *testing.T) {
   f := func(context *TestContext) Response {
     spec.Expect(context.Query["app"]).ToEqual("6003")
     spec.Expect(context.Query["t"]).ToEqual("1 2")
-    return Json("", 200)
+    return Json("").Response
   }
   c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json?APP=6003&t=1%202&").Req
@@ -160,7 +160,7 @@ func TestParsesQueryStirngWithEmptyPairAtTheStart(t *testing.T) {
   spec := gspec.New(t)
   f := func(context *TestContext) Response {
     spec.Expect(context.Query["app"]).ToEqual("100004a")
-    return Json("", 200)
+    return Json("").Response
   }
   c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json?&app=100004a").Method("GET").Req
@@ -172,7 +172,7 @@ func TestParsesQueryStirngWithEmptyPairInTheMiddle(t *testing.T) {
   f := func(context *TestContext) Response {
     spec.Expect(context.Query["app"]).ToEqual("100004a")
     spec.Expect(context.Query["t"]).ToEqual("1")
-    return Json("", 200)
+    return Json("").Response
   }
   c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json?app=100004a&&t=1").Method("GET").Req
@@ -183,7 +183,7 @@ func TestHandlesMultipleQuestionMarksInQueryString(t *testing.T) {
   spec := gspec.New(t)
   f := func(context *TestContext) Response {
     spec.Expect(context.Query["app"]).ToEqual("100005a")
-    return Json("", 200)
+    return Json("").Response
   }
   c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json?app=100002a?app=100005a").Method("GET").Req
@@ -194,7 +194,7 @@ func TestParsesAQueryStringWithAMissingValue(t *testing.T) {
   spec := gspec.New(t)
   f := func(context *TestContext) Response {
     spec.Expect(len(context.Query)).ToEqual(0)
-    return Json("", 200)
+    return Json("").Response
   }
   c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json?a").Method("GET").Req
@@ -205,7 +205,7 @@ func TestParsesAQueryStringWithAMissingValue2(t *testing.T) {
   spec := gspec.New(t)
   f := func(context *TestContext) Response {
     spec.Expect(context.Query["b"]).ToEqual("")
-    return Json("", 200)
+    return Json("").Response
   }
   c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
   req := gspec.Request().Url("/v1/worms/22w.json?b=").Method("GET").Req

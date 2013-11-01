@@ -1,6 +1,7 @@
 package auwfg
 
 import (
+  "strconv"
   "net/http"
   "github.com/viki-org/bytepool"
 )
@@ -9,6 +10,10 @@ type ClosableResponse struct {
   S int
   H http.Header
   B *bytepool.Item
+}
+
+func (r *ClosableResponse) SetStatus(status int) {
+  r.S = status
 }
 
 func (r *ClosableResponse) Status() int {
@@ -29,4 +34,12 @@ func (r *ClosableResponse) Length() int {
 
 func (r *ClosableResponse) Close() {
   r.B.Close()
+}
+
+func newClosableResponse(b *bytepool.Item, s int) Response {
+  return &ClosableResponse{
+    S: s,
+    B: b,
+    H: http.Header{"Content-Type": JsonHeader, "Content-Length": []string{strconv.Itoa(b.Len())}},
+  }
 }
