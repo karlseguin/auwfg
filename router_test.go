@@ -126,6 +126,17 @@ func TestParsesABody(t *testing.T) {
   newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
 }
 
+func TestStoresRawBody(t *testing.T) {
+  spec := gspec.New(t)
+  f := func(context *TestContext) Response {
+    spec.Expect(string(context.RawBody)).ToEqual(`{"hello":"World"}`)
+    return Json("", 200)
+  }
+  c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
+  req := gspec.Request().Url("/v1/worms/22w.json").Method("GET").BodyString(`{"hello":"World"}`).Req
+  newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
+}
+
 func TestHandlesANilResponse(t *testing.T) {
   f := func(context interface{}) Response { return nil }
   c := Configure().Route(R("GET", "v1", "worms", f))

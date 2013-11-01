@@ -10,6 +10,7 @@ func genericContextFactory(c *BaseContext) interface{} { return c }
 type BaseContext struct {
   Route *Route
   Params *Params
+  RawBody []byte
   Body interface{}
   Req *http.Request
   Query map[string]string
