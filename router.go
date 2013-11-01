@@ -99,8 +99,10 @@ func (r *Router) loadBody(route *Route, req *http.Request, context *BaseContext)
   } else if n == r.maxBodySize {
     return r.bodyTooLarge
   }
-  context.RawBody = make([]byte, buffer.Len())
-  copy(context.RawBody, buffer.Bytes())
+  if r.loadRawBody {
+    context.RawBody = make([]byte, buffer.Len())
+    copy(context.RawBody, buffer.Bytes())
+  }
 
   if context.Body != nil {
     if err := json.Unmarshal(context.RawBody, context.Body); err != nil {

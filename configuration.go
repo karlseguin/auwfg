@@ -6,6 +6,7 @@ import (
 
 type Configuration struct {
   address string
+  loadRawBody bool
   bodyPoolSize int
   maxBodySize int64
   invalidPoolSize int
@@ -29,6 +30,7 @@ func Configure() *Configuration{
     address: "127.0.0.1:4577",
     bodyPoolSize: 1024,
     maxBodySize: 32769,
+    loadRawBody: false,
     invalidPoolSize: 1024,
     maxInvalidSize: 32769,
     dispatcher: genericDispatcher,
@@ -100,6 +102,11 @@ func (c *Configuration) BodyPool(poolSize int, bufferSize int) *Configuration {
 func (c *Configuration) InvalidPool(poolSize int, bufferSize int) *Configuration {
   c.invalidPoolSize = poolSize
   c.maxInvalidSize = bufferSize
+  return c
+}
+
+func (c *Configuration) LoadRawBody() *Configuration {
+  c.loadRawBody = true
   return c
 }
 
