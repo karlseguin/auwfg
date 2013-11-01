@@ -13,8 +13,8 @@ var (
 type Response interface {
   SetStatus(status int)
 
-  Status() int
-  Body() []byte
+  GetStatus() int
+  GetBody() []byte
   Header() http.Header
   Close()
 }
@@ -26,6 +26,26 @@ type ResponseBuilder struct {
 func (b *ResponseBuilder) Status(status int) *ResponseBuilder {
   b.Response.SetStatus(status)
   return b
+}
+
+func (b *ResponseBuilder) SetStatus(status int) {
+  b.Response.SetStatus(status)
+}
+
+func (b *ResponseBuilder) GetStatus() int {
+  return b.Response.GetStatus()
+}
+
+func (b *ResponseBuilder) GetBody() []byte {
+  return b.Response.GetBody()
+}
+
+func (b *ResponseBuilder) Header() http.Header {
+  return b.Response.Header()
+}
+
+func (b *ResponseBuilder) Close() {
+  b.Response.Close()
 }
 
 func Json(body interface{}) *ResponseBuilder {

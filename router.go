@@ -39,7 +39,7 @@ func (r *Router) reply(writer http.ResponseWriter, res Response, req *http.Reque
   if res == nil {
     log.Printf("%q nil response", req.URL.String())
     res = r.internalServerError
-  } else  if res.Status() == 500 {
+  } else  if res.GetStatus() == 500 {
     if fatal, ok := res.(*FatalResponse); ok {
       log.Printf("%q %v", req.URL.String(), fatal.err)
     } else {
@@ -49,8 +49,8 @@ func (r *Router) reply(writer http.ResponseWriter, res Response, req *http.Reque
   defer res.Close()
   h := writer.Header()
   for k, v := range res.Header() { h[k] = v }
-  writer.WriteHeader(res.Status())
-  writer.Write(res.Body())
+  writer.WriteHeader(res.GetStatus())
+  writer.Write(res.GetBody())
 }
 
 func (r *Router) loadRouteAndParams(req *http.Request) (*Route, *Params) {

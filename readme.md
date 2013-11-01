@@ -19,7 +19,7 @@ Ultimately, these goals result in actions which are clean, testable and look lik
       remember := input.LongLived
 
       //or create your own response types
-      return auwfg.Json(`{"token":"blah"}`).Status(201).Response
+      return auwfg.Json(`{"token":"blah"}`).Status(201)
     }
 
 ## Configuration
@@ -162,7 +162,7 @@ The reason for responses to implement `Close` is to make it possible to use buff
 
     if res, valid := validate(input); valid == false {
       res.Close() // <- since auwfg will never see this response, you need to take care of closing it yourself
-      return Json("why?!").Response
+      return Json("why?!")s
     }
 
 ## Validation

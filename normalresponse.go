@@ -15,11 +15,11 @@ func (r *NormalResponse) SetStatus(status int) {
   r.S = status
 }
 
-func (r *NormalResponse) Status() int {
+func (r *NormalResponse) GetStatus() int {
   return r.S
 }
 
-func (r *NormalResponse) Body() []byte {
+func (r *NormalResponse) GetBody() []byte {
   return r.B
 }
 

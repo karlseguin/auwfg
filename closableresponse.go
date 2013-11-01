@@ -16,11 +16,11 @@ func (r *ClosableResponse) SetStatus(status int) {
   r.S = status
 }
 
-func (r *ClosableResponse) Status() int {
+func (r *ClosableResponse) GetStatus() int {
   return r.S
 }
 
-func (r *ClosableResponse) Body() []byte {
+func (r *ClosableResponse) GetBody() []byte {
   return r.B.Bytes()
 }
 

@@ -36,11 +36,11 @@ func NewResponse(errors map[string][]*Definition) *InvalidResponse {
 
 func (r *InvalidResponse) SetStatus(status int) {}
 
-func (r *InvalidResponse) Status() int {
+func (r *InvalidResponse) GetStatus() int {
   return 400
 }
 
-func (r *InvalidResponse) Body() []byte {
+func (r *InvalidResponse) GetBody() []byte {
   return r.buffer.Bytes()
 }
 
