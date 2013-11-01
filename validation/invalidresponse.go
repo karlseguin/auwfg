@@ -34,6 +34,8 @@ func NewResponse(errors map[string][]*Definition) *InvalidResponse {
   return &InvalidResponse{buffer}
 }
 
+func (r *InvalidResponse) SetStatus(status int) {}
+
 func (r *InvalidResponse) Status() int {
   return 400
 }
@@ -49,4 +51,3 @@ func (r *InvalidResponse) Header() http.Header {
 func (r *InvalidResponse) Close() {
   r.buffer.Close()
 }
-

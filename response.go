@@ -2,7 +2,6 @@ package auwfg
 
 import (
   "errors"
-  "strconv"
   "net/http"
   "github.com/viki-org/bytepool"
 )
@@ -12,58 +11,33 @@ var (
 )
 
 type Response interface {
+  SetStatus(status int)
+
   Status() int
   Body() []byte
   Header() http.Header
   Close()
 }
 
-type NormalResponse struct {
-  S int
-  B []byte
-  H http.Header
+type ResponseBuilder struct {
+  Response Response
 }
 
-func (r *NormalResponse) Status() int {
-  return r.S
+func (b *ResponseBuilder) Status(status int) *ResponseBuilder {
+  b.Response.SetStatus(status)
+  return b
 }
 
-func (r *NormalResponse) Body() []byte {
-  return r.B
-}
-
-func (r *NormalResponse) Header() http.Header {
-  return r.H
-}
-
-func (r *NormalResponse) Close() {}
-
-func Json(body interface{}, status int) Response {
+func Json(body interface{}) *ResponseBuilder {
   switch b := body.(type) {
   case string:
-    return normalResponse([]byte(b), status)
+    return &ResponseBuilder{newNormalResponse([]byte(b), 200)}
   case []byte:
-    return normalResponse(b, status)
+    return &ResponseBuilder{newNormalResponse(b, 200)}
   case *bytepool.Item:
-    return closableResponse(b, status)
+    return &ResponseBuilder{newClosableResponse(b, 200)}
   default:
-    return Fatal(errors.New("unknown body type"))
-  }
-}
-
-func normalResponse(b []byte, status int) Response {
-  return &NormalResponse{
-    S: status,
-    B: b,
-    H: http.Header{"Content-Type": JsonHeader, "Content-Length": []string{strconv.Itoa(len(b))}},
-  }
-}
-
-func closableResponse(b *bytepool.Item, s int) Response {
-  return &ClosableResponse{
-    S: s,
-    B: b,
-    H: http.Header{"Content-Type": JsonHeader, "Content-Length": []string{strconv.Itoa(b.Len())}},
+    return &ResponseBuilder{Fatal(errors.New("unknown body type"))}
   }
 }
 
@@ -75,3 +49,4 @@ type FatalResponse struct {
 func Fatal(err error) Response {
   return &FatalResponse{err, InternalServerError,}
 }
+

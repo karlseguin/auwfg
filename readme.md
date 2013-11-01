@@ -19,7 +19,7 @@ Ultimately, these goals result in actions which are clean, testable and look lik
       remember := input.LongLived
 
       //or create your own response types
-      return auwfg.Json(`{"token":"blah"}`, 201)
+      return auwfg.Json(`{"token":"blah"}`).Status(201).Response
     }
 
 ## Configuration
@@ -150,7 +150,7 @@ A `auwfg.Response` must implement three members:
 - `Header() http.Header`
 - `Close()`
 
-The `Json(body string, status int)` helper should prove helpful.
+The `Json(body string)` builder should prove helpful.
 
 The `Fatal(err error)` helper should be used when an `InternalServerError` should be returned and an error logged (using the standard logger)
 
@@ -161,7 +161,7 @@ The reason for responses to implement `Close` is to make it possible to use buff
 
     if res, valid := validate(input); valid == false {
       res.Close() // <- since auwfg will never see this response, you need to take care of closing it yourself
-      return Json("why?!")
+      return Json("why?!").Response
     }
 
 ## Validation
