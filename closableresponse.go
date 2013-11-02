@@ -24,7 +24,7 @@ func (r *ClosableResponse) GetBody() []byte {
   return r.B.Bytes()
 }
 
-func (r *ClosableResponse) Header() http.Header {
+func (r *ClosableResponse) GetHeader() http.Header {
   return r.H
 }
 

@@ -23,7 +23,7 @@ func (r *NormalResponse) GetBody() []byte {
   return r.B
 }
 
-func (r *NormalResponse) Header() http.Header {
+func (r *NormalResponse) GetHeader() http.Header {
   return r.H
 }
 

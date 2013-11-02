@@ -2,6 +2,7 @@ package auwfg
 
 import (
   "errors"
+  "strconv"
   "net/http"
   "github.com/viki-org/bytepool"
 )
@@ -15,7 +16,7 @@ type Response interface {
 
   GetStatus() int
   GetBody() []byte
-  Header() http.Header
+  GetHeader() http.Header
   Close()
 }
 
@@ -27,6 +28,16 @@ func (b *ResponseBuilder) Status(status int) *ResponseBuilder {
   b.Response.SetStatus(status)
   return b
 }
+
+func (b *ResponseBuilder) Cache(duration int) *ResponseBuilder {
+  return b.Header("Cache-Control", "private; max-age:" + strconv.Itoa(duration))
+}
+
+func (b *ResponseBuilder) Header(key, value string) *ResponseBuilder {
+  b.Response.GetHeader().Set(key, value)
+  return b
+}
+
 
 func (b *ResponseBuilder) SetStatus(status int) {
   b.Response.SetStatus(status)
@@ -40,8 +51,8 @@ func (b *ResponseBuilder) GetBody() []byte {
   return b.Response.GetBody()
 }
 
-func (b *ResponseBuilder) Header() http.Header {
-  return b.Response.Header()
+func (b *ResponseBuilder) GetHeader() http.Header {
+  return b.Response.GetHeader()
 }
 
 func (b *ResponseBuilder) Close() {

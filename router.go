@@ -48,7 +48,7 @@ func (r *Router) reply(writer http.ResponseWriter, res Response, req *http.Reque
   }
   defer res.Close()
   h := writer.Header()
-  for k, v := range res.Header() { h[k] = v }
+  for k, v := range res.GetHeader() { h[k] = v }
   writer.WriteHeader(res.GetStatus())
   writer.Write(res.GetBody())
 }

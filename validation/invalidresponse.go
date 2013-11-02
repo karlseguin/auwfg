@@ -44,7 +44,7 @@ func (r *InvalidResponse) GetBody() []byte {
   return r.buffer.Bytes()
 }
 
-func (r *InvalidResponse) Header() http.Header {
+func (r *InvalidResponse) GetHeader() http.Header {
   return http.Header{"Content-Type": []string{"application/json; charset=utf-8"}, "Content-Length": []string{strconv.Itoa(r.buffer.Len())}}
 }
 
