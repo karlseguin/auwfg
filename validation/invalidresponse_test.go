@@ -17,8 +17,8 @@ func TestGeneratesaProperJsonMessage(t *testing.T) {
       Define("pw.len", "password","is too\", short", nil),
     },
   })
-  spec.Expect(string(response.Body())).ToEqual(`{"usern\"ame":["username is required","username is already taken"],"password":["is too\", short"]}`)
-  spec.Expect(response.Header().Get("Content-Length")).ToEqual("98")
+  spec.Expect(string(response.GetBody())).ToEqual(`{"usern\"ame":["username is required","username is already taken"],"password":["is too\", short"]}`)
+  spec.Expect(response.GetHeader().Get("Content-Length")).ToEqual("98")
 }
 
 

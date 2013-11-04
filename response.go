@@ -4,7 +4,6 @@ import (
   "errors"
   "strconv"
   "net/http"
-  "github.com/viki-org/bytepool"
 )
 
 var (
@@ -65,7 +64,7 @@ func Json(body interface{}) *ResponseBuilder {
     return &ResponseBuilder{newNormalResponse([]byte(b), 200)}
   case []byte:
     return &ResponseBuilder{newNormalResponse(b, 200)}
-  case *bytepool.Item:
+  case ByteCloser:
     return &ResponseBuilder{newClosableResponse(b, 200)}
   default:
     return &ResponseBuilder{Fatal(errors.New("unknown body type"))}

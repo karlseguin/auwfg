@@ -14,15 +14,15 @@ func TestSetsTheNotFoundResponse(t *testing.T) {
   spec := gspec.New(t)
   expected := Json("the res").Status(244).Response
   actual := Configure().NotFoundResponse(expected).notFound
-  spec.Expect(actual.Status()).ToEqual(244)
-  spec.Expect(string(actual.Body())).ToEqual("the res")
+  spec.Expect(actual.GetStatus()).ToEqual(244)
+  spec.Expect(string(actual.GetBody())).ToEqual("the res")
 }
 
 func TestSetsTheNotFoundBody(t *testing.T) {
   spec := gspec.New(t)
   actual := Configure().NotFound("try again").notFound
-  spec.Expect(actual.Status()).ToEqual(404)
-  spec.Expect(string(actual.Body())).ToEqual("try again")
+  spec.Expect(actual.GetStatus()).ToEqual(404)
+  spec.Expect(string(actual.GetBody())).ToEqual("try again")
 }
 
 func TestAddingASimpleRoute(t *testing.T) {

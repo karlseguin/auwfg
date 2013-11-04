@@ -3,13 +3,18 @@ package auwfg
 import (
   "strconv"
   "net/http"
-  "github.com/viki-org/bytepool"
 )
+
+type ByteCloser interface {
+  Len() int
+  Close()
+  Bytes() []byte
+}
 
 type ClosableResponse struct {
   S int
   H http.Header
-  B *bytepool.Item
+  B ByteCloser
 }
 
 func (r *ClosableResponse) SetStatus(status int) {
@@ -36,7 +41,7 @@ func (r *ClosableResponse) Close() {
   r.B.Close()
 }
 
-func newClosableResponse(b *bytepool.Item, s int) Response {
+func newClosableResponse(b ByteCloser, s int) Response {
   return &ClosableResponse{
     S: s,
     B: b,
