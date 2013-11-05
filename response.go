@@ -2,6 +2,7 @@ package auwfg
 
 import (
   "errors"
+  "strconv"
   "net/http"
 )
 
@@ -24,6 +25,16 @@ type ResponseBuilder struct {
 
 func (b *ResponseBuilder) Status(status int) *ResponseBuilder {
   b.Response.SetStatus(status)
+  return b
+}
+
+func (b *ResponseBuilder) Cache(duration int) *ResponseBuilder {
+  b.Response.GetHeader().Set("Cache-Control", "private,max-age=" + strconv.Itoa(duration))
+  return b
+}
+
+func (b *ResponseBuilder) Header(key, value string) *ResponseBuilder {
+  b.Response.GetHeader().Set(key, value)
   return b
 }
 
