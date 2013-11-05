@@ -48,6 +48,6 @@ func (r *InvalidResponse) GetHeader() http.Header {
   return http.Header{"Content-Type": []string{"application/json; charset=utf-8"}, "Content-Length": []string{strconv.Itoa(r.buffer.Len())}}
 }
 
-func (r *InvalidResponse) Close() {
-  r.buffer.Close()
+func (r *InvalidResponse) Close() error {
+  return r.buffer.Close()
 }

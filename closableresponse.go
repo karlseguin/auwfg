@@ -7,7 +7,7 @@ import (
 
 type ByteCloser interface {
   Len() int
-  Close()
+  Close() error
   Bytes() []byte
 }
 
@@ -37,8 +37,8 @@ func (r *ClosableResponse) Length() int {
   return r.B.Len()
 }
 
-func (r *ClosableResponse) Close() {
-  r.B.Close()
+func (r *ClosableResponse) Close() error {
+  return r.B.Close()
 }
 
 func newClosableResponse(b ByteCloser, s int) Response {

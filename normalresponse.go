@@ -27,7 +27,9 @@ func (r *NormalResponse) GetHeader() http.Header {
   return r.H
 }
 
-func (r *NormalResponse) Close() {}
+func (r *NormalResponse) Close() error {
+  return nil
+}
 
 
 func newNormalResponse(b []byte, status int) Response {
