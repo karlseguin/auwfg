@@ -65,7 +65,7 @@ func (r *Router) loadRouteAndParams(req *http.Request) (*Route, *Params) {
   if l < 2 || l > 5 { return nil, nil }
 
   for index, part := range parts {
-    parts[index] = strings.ToLower(part)
+    parts[index] = part
   }
 
   version, exists := r.routes[parts[0]]
