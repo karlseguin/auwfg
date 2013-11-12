@@ -52,6 +52,15 @@ func TestExecutesAGetAction(t *testing.T) {
   assertResponse(t, res, 200, `{"name":"duncan"}`)
 }
 
+func TestExecutesAnActionRegardlessOfCasing(t *testing.T) {
+  f := func(context interface{}) Response { return Json(`{"name":"duncan"}`).Response }
+  req := gspec.Request().Url("/v2/GHOLAS/123g.json").Req
+  res := httptest.NewRecorder()
+  router := newRouter(Configure().Route(R("GET", "v2", "gholas", f)))
+  router.ServeHTTP(res, req)
+  assertResponse(t, res, 200, `{"name":"duncan"}`)
+}
+
 func TestExecutesAPostAction(t *testing.T) {
   f := func(context interface{}) Response { return Json(`{"name":"shaihulud"}`).Response }
   req := gspec.Request().Url("/v1/worms.json").Method("POST").Req

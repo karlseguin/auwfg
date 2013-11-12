@@ -116,18 +116,18 @@ func loadParams(parts []string) *Params {
   params := new(Params)
   switch len(parts) {
   case 1:
-    params.Resource = parts[0]
+    params.Resource = strings.ToLower(parts[0])
   case 2:
-    params.Resource = parts[0]
+    params.Resource = strings.ToLower(parts[0])
     params.Id = parts[1]
   case 3:
-    params.ParentResource = parts[0]
+    params.ParentResource = strings.ToLower(parts[0])
     params.ParentId = parts[1]
     params.Resource = parts[2]
   case 4:
-    params.ParentResource = parts[0]
+    params.ParentResource = strings.ToLower(parts[0])
     params.ParentId = parts[1]
-    params.Resource = parts[2]
+    params.Resource = strings.ToLower(parts[2])
     params.Id = parts[3]
   }
   return params
