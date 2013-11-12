@@ -9,8 +9,8 @@ import (
   "github.com/viki-org/auwfg/validation"
 )
 
-var NotFound = Json(`{"error":"not found","code":404}`).Status(404).Response
-var InternalServerError = Json(`{"error":"internal server error","code":500}`).Status(500).Response
+var NotFound = newNormalResponse([]byte(`{"error":"not found","code":404}`), 404)
+var InternalServerError = newNormalResponse([]byte(`{"error":"internal server error","code":500}`), 500)
 var Deleted = &NormalResponse{204, []byte{}, http.Header{"Content-Length": []string{"0"}}}
 
 func Run(config *Configuration) {
