@@ -20,6 +20,7 @@ func newRouter(c *Configuration) *Router {
 }
 
 func (r *Router) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
+  Stats.Request()
   route, params := r.loadRouteAndParams(req)
   if route == nil {
     r.reply(writer, r.notFound, req)
@@ -39,13 +40,20 @@ func (r *Router) reply(writer http.ResponseWriter, res Response, req *http.Reque
   if res == nil {
     log.Printf("%q nil response", req.URL.String())
     res = r.internalServerError
-  } else  if res.GetStatus() == 500 {
-    if fatal, ok := res.(*FatalResponse); ok {
-      log.Printf("%q %v", req.URL.String(), fatal.err)
-    } else {
-      log.Printf("%q 500", req.URL.String())
+  } else {
+    status := res.GetStatus()
+    if status >= 500 {
+      Stats.Fatal()
+      if fatal, ok := res.(*FatalResponse); ok {
+        log.Printf("%q %v", req.URL.String(), fatal.err)
+      } else {
+        log.Printf("%q 500", req.URL.String())
+      }
+    } else if status >= 400 {
+      Stats.Error()
     }
   }
+
   defer res.Close()
   h := writer.Header()
   for k, v := range res.GetHeader() { h[k] = v }

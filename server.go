@@ -17,7 +17,7 @@ func Run(config *Configuration) {
   NotFound = config.notFound
   InternalServerError = config.internalServerError
   validation.InitInvalidPool(config.invalidPoolSize, config.maxInvalidSize)
-
+  startStats(config)
   s := &http.Server{
     MaxHeaderBytes: 8192,
     Handler: newRouter(config),

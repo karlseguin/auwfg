@@ -1,12 +1,14 @@
 package auwfg
 
 import (
+  "time"
   "strings"
 )
 
 type Configuration struct {
   address string
   loadRawBody bool
+  statsFile string
   bodyPoolSize int
   maxBodySize int64
   invalidPoolSize int
@@ -14,6 +16,7 @@ type Configuration struct {
   notFound Response
   bodyTooLarge Response
   invalidFormat Response
+  statsSleep time.Duration
   internalServerError Response
   routes versions
   dispatcher Dispatcher
@@ -33,6 +36,8 @@ func Configure() *Configuration{
     loadRawBody: false,
     invalidPoolSize: 1024,
     maxInvalidSize: 32769,
+    statsFile: "stats.json",
+    statsSleep: time.Minute,
     dispatcher: genericDispatcher,
     contextFactory: genericContextFactory,
     notFound: NotFound,
@@ -67,6 +72,16 @@ func (c *Configuration) BodyTooLarge(body string) *Configuration {
 
 func (c *Configuration) InvalidFormatResponse(r Response) *Configuration {
   c.invalidFormat = r
+  return c
+}
+
+func (c *Configuration) StatsSleep(sleep time.Duration) *Configuration {
+  c.statsSleep = sleep
+  return c
+}
+
+func (c *Configuration) StatsFile(file string) *Configuration {
+  c.statsFile = file
   return c
 }
 
