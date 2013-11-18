@@ -36,9 +36,9 @@ func snapshot(c *Configuration) {
 
     buffer.Reset()
     buffer.WriteString(`{"requests":` + strconv.FormatUint(requests - last.requests , 10))
-    buffer.WriteString(`,"errors":"` + strconv.FormatUint(errors - last.errors, 10))
-    buffer.WriteString(`,"fatals":"` + strconv.FormatUint(fatals - last.fatals, 10))
-    buffer.WriteString(`,"goroutines":"` + strconv.Itoa(runtime.NumGoroutine()))
+    buffer.WriteString(`,"errors":` + strconv.FormatUint(errors - last.errors, 10))
+    buffer.WriteString(`,"fatals":` + strconv.FormatUint(fatals - last.fatals, 10))
+    buffer.WriteString(`,"goroutines":` + strconv.Itoa(runtime.NumGoroutine()))
     buffer.WriteString("}")
 
     last.requests = requests
