@@ -2,6 +2,7 @@ package auwfg
 
 import(
   "log"
+  "net"
   "strings"
   "net/url"
   "net/http"
@@ -32,6 +33,7 @@ func (r *Router) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
     return
   }
   bc.Query = loadQuery(req.URL.RawQuery)
+  bc.RemoteIp = loadRemoteIp(req)
   context := r.contextFactory(bc)
   r.reply(writer, r.dispatcher(route, context), req)
 }
@@ -165,4 +167,18 @@ func loadQuery(raw string) map[string]string {
     }
   }
   return query
+}
+
+func loadRemoteIp(req *http.Request) net.IP {
+  //susceptible to ip spoofing attacks. Could implement a whitelist of trusted proxies.
+  ips := req.Header.Get("x-forwarded-for")
+  if len(ips) == 0 {
+    ips = req.Header.Get("client-ip")
+    if len(ips) == 0 {
+      ips = req.Header.Get("remote-addr")
+      if len(ips) == 0 { return nil }
+    }
+  }
+
+  return net.ParseIP(strings.Split(ips, ",")[0])
 }
