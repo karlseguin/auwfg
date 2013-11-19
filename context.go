@@ -1,6 +1,7 @@
 package auwfg
 
 import (
+  "net"
   "net/http"
 )
 
@@ -14,6 +15,7 @@ type BaseContext struct {
   Body interface{}
   Req *http.Request
   Query map[string]string
+  RemoteIp net.IP
 }
 
 func newBaseContext(route *Route, params *Params, req *http.Request) *BaseContext{

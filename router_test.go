@@ -243,6 +243,57 @@ func TestParsesAQueryStringWithAMissingValue2(t *testing.T) {
   newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
 }
 
+func TestNoIpPresent(t *testing.T) {
+  f := func(context *TestContext) Response {
+    gspec.New(t).Expect(context.RemoteIp).ToBeNil()
+    return Json("").Response
+  }
+  c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
+  req := gspec.Request().Url("/v1/worms/22w.json").Method("GET").Req
+  newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
+}
+
+func TestInvalidIp(t *testing.T) {
+  f := func(context *TestContext) Response {
+    gspec.New(t).Expect(context.RemoteIp).ToBeNil()
+    return Json("").Response
+  }
+  c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
+  req := gspec.Request().Url("/v1/worms/22w.json").Header("x-forwarded-for", "12.12").Method("GET").Req
+  newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
+}
+
+func TestLoadIpFromXForwardedIp(t *testing.T) {
+  f := func(context *TestContext) Response {
+    gspec.New(t).Expect(context.RemoteIp.String()).ToEqual("12.12.12.12")
+    return Json("").Response
+  }
+  c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
+  req := gspec.Request().Header("x-forwarded-for", "12.12.12.12,13.13.13.13").Header("client-ip", "11.11.11.11")
+  req = req.Header("remote-addr", "10.10.10.10").Url("/v1/worms/22w.json").Method("GET")
+  newRouter(c).ServeHTTP(httptest.NewRecorder(), req.Req)
+}
+
+func TestLoadIpFromClientIp(t *testing.T) {
+  f := func(context *TestContext) Response {
+    gspec.New(t).Expect(context.RemoteIp.String()).ToEqual("10.10.10.10")
+    return Json("").Response
+  }
+  c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
+  req := gspec.Request().Header("client-ip", "10.10.10.10").Header("remote-addr", "12.12.10.10").Url("/v1/worms/22w.json").Method("GET").Req
+  newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
+}
+
+func TestLoadIpFromRemoteAddr(t *testing.T) {
+  f := func(context *TestContext) Response {
+    gspec.New(t).Expect(context.RemoteIp.String()).ToEqual("13.10.10.10")
+    return Json("").Response
+  }
+  c := Configure().Route(R("GET", "v1", "worms", f)).ContextFactory(testContextFactory).Dispatcher(testDispatcher)
+  req := gspec.Request().Header("remote-addr", "13.10.10.10").Url("/v1/worms/22w.json").Method("GET").Req
+  newRouter(c).ServeHTTP(httptest.NewRecorder(), req)
+}
+
 func assertResponse(t *testing.T, res *httptest.ResponseRecorder, status int, raw string) {
   spec := gspec.New(t)
   spec.Expect(res.Code).ToEqual(status)
@@ -258,10 +309,14 @@ type TestBody struct {
   Hello string
 }
 
-func testContextFactory(c *BaseContext) interface{} { return &TestContext{"leto",c} }
+func testContextFactory(c *BaseContext) interface{} {
+  return &TestContext{"leto", c}
+}
+
 func testDispatcher(route *Route, context interface{}) Response {
   return route.Action.(func(*TestContext) Response)(context.(*TestContext))
 }
+
 func testBodyFactory() interface{} {
   return new(TestBody)
 }

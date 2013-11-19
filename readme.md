@@ -44,7 +44,15 @@ Possible configuration options are:
 - `Route`: [explained below](#routing)
 - `BodyPool`: [explained below](#bodypool)
 - `InvalidPool`: [explained below](#invalidpool)
-- `LoadRawBody`: The raw/unparsed body will be availble in the context (useful for debugging)
+- `LoadRawBody`: The raw/unparsed body will be available in the context (useful for debugging)
+
+## BaseContext
+The base context of auwfg provides a series of useful attributes:
+
+- `Query`: (map[string]string) A hash map with query parameters found in the request
+- `RemoteIp`: (net.IP) The IP of the client that made the request. This is extracted from the HTTP headers x-forwarded-for, client-ip and remote-addr (the first one with an IP is the value of the remote IP).
+- `Params`: Parameters extracted from the URL. [explained below](#nr)
+- `RawBody`: The raw body bytes of the request. Only available if `LoadRawBody` configuration is set.
 
 <a id="cfd"></a>
 ## ContextFactory and Dispatcher
@@ -110,6 +118,7 @@ Note that the method for a `GET` with no id is called `LIST`. The `gholas.List|S
 
 The captured parameters, "v1", "gholas" and "SOMEID" are available in the `BaseContext.Params` (`Version`, `Resourc`e and `Id` fields respectively), which you've hopefully preserved in your own context.
 
+<a id="nr"></a>
 ### Nested Routes
 A nested route, is configured by specifying the route's `Parent`:
 
