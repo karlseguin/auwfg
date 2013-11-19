@@ -179,6 +179,7 @@ func loadRemoteIp(req *http.Request) net.IP {
       if len(ips) == 0 { return nil }
     }
   }
-
-  return net.ParseIP(strings.Split(ips, ",")[0])
+  index := strings.Index(ips, ",")
+  if index != -1 { ips = ips[0:index]}
+  return net.ParseIP(ips)
 }
