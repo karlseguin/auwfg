@@ -90,7 +90,7 @@ func TestRoutesToANestedResource(t *testing.T) {
   }
   req := gspec.Request().Url("/v2/gholas/123g/history.json").Req
   res := httptest.NewRecorder()
-  router := newRouter(Configure().Route(R("LIST", "v2", "history", f).Parent("gholas")))
+  router := newRouter(Configure().Route(R("LIST", "v2", "gholas/history", f)))
   router.ServeHTTP(res, req)
   assertResponse(t, res, 200, `{"name":"history"}`)
 }

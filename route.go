@@ -1,5 +1,9 @@
 package auwfg
 
+import (
+  "strings"
+)
+
 type BodyFactory func() interface{}
 
 type Route struct {
@@ -17,20 +21,22 @@ type RouteBuilder struct {
 }
 
 func R(method, version, resource string, action interface{}) *RouteBuilder {
+  parentResource := ""
+  if index := strings.Index(resource, "/"); index > -1 {
+    parentResource = resource[:index]
+    resource = resource[index+1:]
+  }
+
   return &RouteBuilder{
     action: action,
     method: method,
     version: version,
     resource: resource,
+    parentResource: parentResource,
   }
 }
 
 func (r *RouteBuilder) BodyFactory(bf func() interface{}) *RouteBuilder {
   r.bf = bf
-  return r
-}
-
-func (r *RouteBuilder) Parent(parentResource string) *RouteBuilder {
-  r.parentResource = parentResource
   return r
 }

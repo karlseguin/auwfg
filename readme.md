@@ -120,9 +120,9 @@ The captured parameters, "v1", "gholas" and "SOMEID" are available in the `BaseC
 
 <a id="nr"></a>
 ### Nested Routes
-A nested route, is configured by specifying the route's `Parent`:
+A nested route is configured as such:
 
-    c.Route(auwfg.R("LIST", "v1", "history", gholas.Show).Parent("gholas"))
+    c.Route(auwfg.R("LIST", "v1", "ghoas/history", gholas.Show))
 
 Will match `GET /v1/gholas/SOMEID/history.json`
 
