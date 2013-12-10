@@ -146,7 +146,7 @@ When no body is present, an empty instance is made available. If, however, there
 
 <a id="bodypool"></a>
 ### Pool Size
-A [fixed-length byte pool](https://github.com/viki-org/bytepool) is used to parse input bodies. The size of this pool is configured with the `BodyPool` configuration method. For example, to specify a max input body size of 64K and to pre-allocate 512 slots, you'd use:
+A [fixed-length byte pool](https://github.com/karlseguin/bytepool) is used to parse input bodies. The size of this pool is configured with the `BodyPool` configuration method. For example, to specify a max input body size of 64K and to pre-allocate 512 slots, you'd use:
 
     c := auwfg.Configure().BodyPool(512, 64 * 1024)
 
@@ -178,8 +178,8 @@ The reason for responses to implement `Close` is to make it possible to use buff
 AUWFG has some basic input validation facilities. Validation works in two phases. The first phase is to define rules. The second phase is to validate the actual data:
 
     import (
-      "github.com/viki-org/auwfg"
-      "github.com/viki-org/auwfg/validation"
+      "github.com/karlseguin/auwfg"
+      "github.com/karlseguin/auwfg/validation"
     )
 
     func init() {
@@ -218,7 +218,7 @@ In addition to calling `Response`, which returns `(auwfg.Response, bool)`, `IsVa
 
 <a id="invalidpool"></a>
 ### Pool Size
-A [fixed-length byte pool](https://github.com/viki-org/bytepool) is used to generate validation response. The size of this pool is configured with the `InvalidPool` configuration method. For example, to specify a max response size of 32 and to pre-allocate 256 slots, you'd use:
+A [fixed-length byte pool](https://github.com/karlseguin/bytepool) is used to generate validation response. The size of this pool is configured with the `InvalidPool` configuration method. For example, to specify a max response size of 32 and to pre-allocate 256 slots, you'd use:
 
     c := auwfg.Configure().InvalidPool(256, 32 * 1024)
 

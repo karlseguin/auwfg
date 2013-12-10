@@ -1,10 +1,9 @@
 package auwfg
 
 import (
-  "github.com/viki-org/auwfg/validation"
+	"github.com/karlseguin/auwfg/validation"
 )
 
 func Validator() *validation.Validator {
-  return new(validation.Validator)
+	return new(validation.Validator)
 }
-
